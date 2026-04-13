@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Shokh Food Premium App</title>
+    <title>Shokh Food Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* LUXURY DARK DESIGN SYSTEM */
         :root {
             --bg: #0f172a;
             --card: #1e293b;
@@ -16,247 +15,132 @@
             --success: #10b981;
             --danger: #ef4444;
             --gradient: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
             --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); padding: 15px; padding-bottom: 100px; }
 
-        body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 15px;
-            padding-bottom: 120px;
-            overflow-x: hidden;
-        }
+        .panel { display: none; animation: slideUp 0.5s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ANIMATIONS */
-        .panel { 
-            display: none; 
-            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
+        header { text-align: center; padding: 20px 0; }
+        header h1 { font-size: 28px; letter-spacing: 3px; text-transform: uppercase; font-weight: 900; }
+        header h1 span { color: var(--accent); }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-
-        /* HEADER */
-        header { text-align: center; padding: 25px 0; }
-        header h1 {
-            font-size: 30px;
-            letter-spacing: 5px;
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-        header h1 span { 
-            color: var(--accent); 
-            text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
-        }
-
-        /* CATEGORIES */
-        .categories {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding: 10px 5px 30px 5px;
-            scrollbar-width: none;
-        }
-        .categories::-webkit-scrollbar { display: none; }
-
-        .cat {
-            background: var(--card);
-            padding: 12px 25px;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            white-space: nowrap;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .cat:hover {
-            border-color: var(--accent);
-            transform: translateY(-3px);
-        }
-        .cat.active {
-            background: var(--accent);
-            color: #000;
-            border-color: var(--accent);
-            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.4);
-        }
-
-        /* FOOD CARDS & HOVER */
         .food-card {
             background: var(--card);
-            border-radius: 30px;
+            border-radius: 25px;
             padding: 20px;
-            margin-bottom: 22px;
+            margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             transition: var(--transition);
-            box-shadow: var(--shadow);
-            cursor: pointer;
         }
-        .food-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: rgba(56, 189, 248, 0.4);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-        }
-        .food-emoji { font-size: 50px; transition: var(--transition); }
-        .food-card:hover .food-emoji { transform: rotate(15deg) scale(1.2); }
+        .food-card:hover { transform: translateY(-5px); border-color: var(--accent); }
 
-        .food-info { flex: 1; }
-        .food-info h3 { font-size: 19px; margin-bottom: 6px; font-weight: 800; }
-        .food-info p { font-size: 13px; color: var(--secondary); margin-bottom: 15px; }
-
-        /* BUTTONS */
         .btn-add {
             background: var(--gradient);
             color: #000;
             border: none;
-            padding: 10px 20px;
-            border-radius: 14px;
-            font-weight: 900;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-weight: 800;
             cursor: pointer;
             transition: var(--transition);
         }
-        .btn-add:hover { transform: scale(1.1); box-shadow: 0 0 20px var(--accent); }
 
-        /* INPUTS FOR ADMIN */
-        .input-field {
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 5px; color: var(--secondary); font-size: 12px; }
+        input {
             width: 100%;
             padding: 15px;
-            margin-bottom: 15px;
             background: #0f172a;
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
+            border-radius: 12px;
             color: white;
-            font-size: 16px;
             outline: none;
+            font-size: 16px;
         }
-        .input-field:focus { border-color: var(--accent); }
+        input:focus { border-color: var(--accent); }
 
-        /* ALERT & INFO BOX */
-        .info-card {
-            background: var(--card);
-            border-radius: 25px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .alert-box {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid var(--success);
-            padding: 20px;
-            border-radius: 20px;
-            color: var(--success);
-            text-align: center;
-            animation: pulse 2s infinite;
-        }
+        .info-card { background: var(--card); border-radius: 25px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
 
     <div id="user-panel" class="panel" style="display: block;">
-        <header>
-            <h1>SHOKH <span>FOOD</span></h1>
-            <p style="color:var(--secondary); font-size:10px; letter-spacing:2px;">PREMIUM QUALITY</p>
-        </header>
-
-        <div class="categories">
-            <div class="cat active" onclick="filterMenu('all', this)">Barchasi</div>
-            <div class="cat" onclick="filterMenu('burger', this)">🍔 Burgerlar</div>
-            <div class="cat" onclick="filterMenu('lavash', this)">🌯 Lavashlar</div>
-        </div>
-
+        <header><h1>SHOKH <span>FOOD</span></h1></header>
         <div id="menu-container">
-            <div class="food-card" data-category="burger">
-                <div class="food-emoji">🍔</div>
-                <div class="food-info">
+            <div class="food-card">
+                <div style="font-size: 45px;">🍔</div>
+                <div style="flex:1">
                     <h3>Burger Maxi</h3>
-                    <p>Go'shtli kotlet va pishloqli burger.</p>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="color:var(--accent); font-weight:900;">45,000 so'm</span>
-                        <button class="btn-add" onclick="addToCart('Burger Maxi', 45000)">+</button>
-                    </div>
+                    <p style="font-size: 12px; color: var(--secondary);">45,000 so'm</p>
                 </div>
+                <button class="btn-add" onclick="addToCart('Burger Maxi', 45000)">+</button>
             </div>
         </div>
+    </div>
+
+    <div id="details-panel" class="panel">
+        <h2 style="text-align:center; margin-bottom:20px;">Ma'lumotlaringiz</h2>
+        <div class="info-card">
+            <div class="input-group">
+                <label>Telefon raqam:</label>
+                <input type="tel" id="user-phone" placeholder="+998 90 123 45 67">
+            </div>
+            <div class="input-group">
+                <label>Yetkazish manzili:</label>
+                <input type="text" id="user-address" placeholder="Ko'cha, uy, kvartira...">
+            </div>
+            <button class="btn-add" style="width:100%;" onclick="saveDetails()">DAVOM ETISH</button>
+        </div>
+        <button class="btn-add" style="width:100%; background:var(--card); color:white;" onclick="switchPanel('user-panel')">ORQAGA</button>
     </div>
 
     <div id="payment-panel" class="panel">
-        <h2 style="text-align:center; margin-bottom:30px; color:var(--accent);">TO'LOV USULINI TANLANG</h2>
-        
-        <div class="food-card" style="justify-content:center; text-align:center; padding:35px;" onclick="finishOrder('Naqd pul (Kuryerga)')">
-            <div>
-                <span style="font-size:50px; display:block; margin-bottom:10px;">💵</span>
-                <h3>Naqd pul orqali</h3>
-                <p>Eshik oldida to'lash</p>
-            </div>
+        <h2 style="text-align:center; margin-bottom:20px;">To'lov usuli</h2>
+        <div class="food-card" onclick="processOrder('Naqd pul')">
+            <span style="font-size:40px;">💵</span>
+            <h3>Naqd pul orqali</h3>
         </div>
-
-        <div class="food-card" style="justify-content:center; text-align:center; padding:35px;" onclick="showCardDetails()">
-            <div>
-                <span style="font-size:50px; display:block; margin-bottom:10px;">💳</span>
-                <h3>Karta orqali</h3>
-                <p>Onlayn o'tkazma</p>
-            </div>
+        <div class="food-card" onclick="showCardPage()">
+            <span style="font-size:40px;">💳</span>
+            <h3>Karta orqali</h3>
         </div>
-
-        <button class="btn-add" style="width:100%; background:var(--card); color:white; height:60px;" onclick="switchPanel('user-panel')">ORQAGA</button>
+        <button class="btn-add" style="width:100%; background:var(--card); color:white;" onclick="switchPanel('details-panel')">ORQAGA</button>
     </div>
 
     <div id="card-panel" class="panel">
-        <h2 style="text-align:center; margin-bottom:25px; color:var(--accent);">O'TKAZMA TAFSILOTLARI</h2>
         <div class="info-card">
-            <p style="color:var(--secondary); font-size:12px;">To'lanadigan summa:</p>
-            <h1 id="final-total" style="color:var(--accent); margin-bottom:20px;">0 so'm</h1>
-            
-            <p style="color:var(--secondary); font-size:12px;">Karta raqami:</p>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <b style="font-size:18px;">8600 0000 0000 0000</b>
-                <button onclick="copyCard()" style="background:var(--accent); border:none; padding:5px 10px; border-radius:8px; font-weight:bold; cursor:pointer;">NUSXA</button>
-            </div>
-
-            <p style="color:var(--secondary); font-size:12px;">Ega:</p>
-            <b style="font-size:18px;">Shahriyor Allaberganov</b>
+            <p>To'lov summasi:</p>
+            <h1 id="total-price" style="color:var(--accent);">0 so'm</h1>
+            <hr style="opacity:0.1; margin:15px 0;">
+            <p>Karta raqami: <b>8600 0000 0000 0000</b></p>
+            <p>Ega: <b>Shahriyor Allaberganov</b></p>
         </div>
-        <div class="alert-box">
-            ✅ To'lovdan so'ng chekni @shakhriyarr lichkasiga yuboring!
-        </div>
-        <button class="btn-add" style="width:100%; height:60px; margin-top:20px;" onclick="finishOrder('Karta orqali (Chek kutilmoqda)')">BUYURTMANI TASDIQLASH</button>
+        <button class="btn-add" style="width:100%;" onclick="processOrder('Karta (Chek kutilmoqda)')">BUYURTMANI TASDIQLASH</button>
     </div>
 
     <div id="admin-panel" class="panel">
-        <h2 style="text-align:center; margin-bottom:25px; color:var(--accent);">YANGI TAOM QO'SHISH</h2>
+        <h2 style="text-align:center; margin-bottom:20px;">Admin: Taom Qo'shish</h2>
         <div class="info-card">
-            <input type="text" id="admin-food-name" class="input-field" placeholder="Taom nomi (masalan: Lavash)...">
-            <input type="number" id="admin-food-price" class="input-field" placeholder="Narxi (masalan: 35000)...">
-            <input type="text" id="admin-food-category" class="input-field" placeholder="Kategoriya (burger/lavash/drink)...">
-            <button class="btn-add" style="width:100%; height:55px;" onclick="adminAddFood()">BAZAGA QO'SHISH</button>
+            <input type="text" id="adm-name" placeholder="Nomi..." class="input-group"><br>
+            <input type="number" id="adm-price" placeholder="Narxi..." class="input-group">
+            <button class="btn-add" style="width:100%;" onclick="adminSend()">QO'SHISH</button>
         </div>
-        <button class="btn-add" style="width:100%; background:var(--card); color:white; height:50px;" onclick="switchPanel('user-panel')">MENYUGA QAYTISH</button>
+        <button class="btn-add" style="width:100%; background:var(--card); color:white;" onclick="switchPanel('user-panel')">MENYUGA QAYTISH</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         let cart = [];
+        let userPhone = '';
+        let userAddress = '';
 
         function switchPanel(id) {
             document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
@@ -267,68 +151,61 @@
 
         function addToCart(name, price) {
             cart.push({name, price});
-            tg.HapticFeedback.notificationOccurred('success');
+            tg.HapticFeedback.impactOccurred('medium');
             updateMainButton();
         }
 
         function updateMainButton() {
-            if (cart.length > 0) {
+            if(cart.length > 0) {
                 const total = cart.reduce((s, i) => s + i.price, 0);
-                tg.MainButton.setText(`TASDIQLASH (${total.toLocaleString()} so'm)`).show();
+                tg.MainButton.setText(`BUYURTMA BERISH (${total.toLocaleString()} so'm)`).show();
             } else tg.MainButton.hide();
         }
 
-        tg.onEvent('mainButtonClicked', () => switchPanel('payment-panel'));
+        tg.onEvent('mainButtonClicked', () => switchPanel('details-panel'));
 
-        function showCardDetails() {
+        function saveDetails() {
+            userPhone = document.getElementById('user-phone').value;
+            userAddress = document.getElementById('user-address').value;
+            if(!userPhone || !userAddress) return tg.showAlert("Ma'lumotlarni to'ldiring!");
+            switchPanel('payment-panel');
+        }
+
+        function showCardPage() {
             const total = cart.reduce((s, i) => s + i.price, 0);
-            document.getElementById('final-total').innerText = total.toLocaleString() + " so'm";
+            document.getElementById('total-price').innerText = total.toLocaleString() + " so'm";
             switchPanel('card-panel');
         }
 
-        function copyCard() {
-            navigator.clipboard.writeText('8600000000000000');
-            tg.showAlert("Karta nusxalandi!");
-        }
-
-        // --- BUYURTMANI TASDIQLASH ---
-        function finishOrder(method) {
+        function processOrder(method) {
             const total = cart.reduce((s, i) => s + i.price, 0);
             const data = {
-                action: 'NEW_ORDER',
+                type: 'NEW_ORDER',
                 items: cart,
                 total: total,
                 method: method,
-                user: tg.initDataUnsafe.user || { first_name: 'Foydalanuvchi', id: 0 }
+                phone: userPhone,
+                address: userAddress,
+                user: tg.initDataUnsafe.user
             };
             tg.sendData(JSON.stringify(data));
         }
 
-        // --- ADMIN TAOM QO'SHISH ---
-        function adminAddFood() {
-            const name = document.getElementById('admin-food-name').value;
-            const price = document.getElementById('admin-food-price').value;
-            const cat = document.getElementById('admin-food-category').value;
-
-            if(!name || !price) return tg.showAlert("Ma'lumotlarni to'ldiring!");
-
-            const data = {
-                action: 'ADD_FOOD',
-                foodName: name,
-                foodPrice: price,
-                foodCategory: cat
-            };
-            tg.sendData(JSON.stringify(data));
+        function adminSend() {
+            const name = document.getElementById('adm-name').value;
+            const price = document.getElementById('adm-price').value;
+            if(!name || !price) return tg.showAlert("To'ldiring!");
+            tg.sendData(JSON.stringify({type: 'ADD_FOOD', name, price}));
         }
 
-        // Adminni aniqlash (Shahriyor Allaberganov)
+        // Admin tugmasi
         if(tg.initDataUnsafe.user && tg.initDataUnsafe.user.id === 8448862547) {
-            const adminBtn = document.createElement('button');
-            adminBtn.innerText = "⚙️ ADMIN PANEL";
-            adminBtn.className = "btn-add";
-            adminBtn.style = "position:fixed; bottom:20px; right:20px; z-index:9999;";
-            adminBtn.onclick = () => switchPanel('admin-panel');
-            document.body.appendChild(adminBtn);
+            const abtn = document.createElement('button');
+            abtn.innerText = "ADMIN";
+            abtn.className = "btn-add";
+            abtn.style = "position:fixed; bottom:10px; right:10px; opacity:0.7;";
+            abtn.onclick = () => switchPanel('admin-panel');
+            document.body.appendChild(abtn);
         }
     </script>
 </body>
