@@ -13,16 +13,16 @@
             --text: #f8fafc;
             --secondary: #94a3b8;
             --success: #10b981;
-            --danger: #ef4444;
             --gradient: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
-            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: all 0.3s ease;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); padding: 15px; padding-bottom: 100px; }
 
-        .panel { display: none; animation: slideUp 0.5s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .panel { display: none; }
+        .panel.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         header { text-align: center; padding: 20px 0; }
         header h1 { font-size: 28px; letter-spacing: 3px; text-transform: uppercase; font-weight: 900; }
@@ -30,30 +30,28 @@
 
         .food-card {
             background: var(--card);
-            border-radius: 25px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
             gap: 15px;
             transition: var(--transition);
-            cursor: pointer;
         }
-        .food-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+        .food-card:active { transform: scale(0.98); }
 
         .btn-add {
             background: var(--gradient);
             color: #000;
             border: none;
-            padding: 12px 20px;
-            border-radius: 15px;
+            padding: 10px 15px;
+            border-radius: 12px;
             font-weight: 800;
             cursor: pointer;
-            transition: var(--transition);
         }
 
-        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group { margin-bottom: 15px; }
         input {
             width: 100%;
             padding: 15px;
@@ -61,158 +59,154 @@
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             color: white;
-            outline: none;
             font-size: 16px;
+            outline: none;
         }
         input:focus { border-color: var(--accent); }
 
-        .info-card { background: var(--card); border-radius: 25px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .info-card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
         
-        .admin-link {
+        /* Maxsus Admin Link Style */
+        .admin-btn-link {
+            display: inline-block;
+            margin-top: 10px;
             color: var(--accent);
             text-decoration: none;
             font-weight: bold;
-            border-bottom: 1px dashed var(--accent);
+            background: rgba(56, 189, 248, 0.1);
+            padding: 8px 15px;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
 
-    <div id="user-panel" class="panel" style="display: block;">
+    <div id="user-panel" class="panel active">
         <header><h1>SHOKH <span>FOOD</span></h1></header>
         <div id="menu-container">
             <div class="food-card">
-                <div style="font-size: 45px;">🍔</div>
+                <div style="font-size: 40px;">🍔</div>
                 <div style="flex:1">
                     <h3>Burger Maxi</h3>
                     <p style="font-size: 12px; color: var(--secondary);">45,000 so'm</p>
                 </div>
-                <button class="btn-add" onclick="addToCart('Burger Maxi', 45000)">+</button>
+                <button class="btn-add" onclick="addToCart('Burger Maxi', 45000)">QO'SHISH</button>
             </div>
-            </div>
+        </div>
     </div>
 
     <div id="details-panel" class="panel">
-        <h2 style="text-align:center; margin-bottom:20px;">Yetkazish ma'lumotlari</h2>
+        <h2 style="text-align:center; margin-bottom:20px;">Ma'lumotlar</h2>
         <div class="info-card">
-            <div class="input-group">
-                <input type="tel" id="user-phone" placeholder="Telefon (masalan: +998901234567)">
-            </div>
-            <div class="input-group">
-                <input type="text" id="user-address" placeholder="Manzil (Ko'cha, uy, mo'ljal)">
-            </div>
-            <button class="btn-add" style="width:100%;" onclick="saveDetails()">DAVOM ETISH</button>
+            <input type="tel" id="u-phone" placeholder="Telefon raqamingiz" class="input-group">
+            <input type="text" id="u-address" placeholder="Yetkazish manzili" class="input-group">
+            <button class="btn-add" style="width:100%;" onclick="checkDetails()">DAVOM ETISH</button>
         </div>
-        <button class="btn-add" style="width:100%; background:transparent; color:var(--secondary);" onclick="switchPanel('user-panel')">ORQAGA</button>
+        <button onclick="switchPanel('user-panel')" style="background:none; border:none; color:var(--secondary); width:100%;">ORQAGA</button>
     </div>
 
     <div id="payment-panel" class="panel">
         <h2 style="text-align:center; margin-bottom:20px;">To'lov usuli</h2>
-        <div class="food-card" onclick="processOrder('Naqd pul')">
-            <span style="font-size:40px;">💵</span>
-            <h3>Naqd pul orqali</h3>
+        <div class="food-card" onclick="finalProcess('Naqd pul')">
+            <span style="font-size:35px;">💵</span>
+            <h3>Naqd pul (Kuryerga)</h3>
         </div>
-        <div class="food-card" onclick="showCardPage()">
-            <span style="font-size:40px;">💳</span>
-            <h3>Karta orqali</h3>
+        <div class="food-card" onclick="switchPanel('card-panel')">
+            <span style="font-size:35px;">💳</span>
+            <h3>Karta orqali (O'tkazma)</h3>
         </div>
-        <button class="btn-add" style="width:100%; background:transparent; color:var(--secondary);" onclick="switchPanel('details-panel')">ORQAGA</button>
     </div>
 
     <div id="card-panel" class="panel">
-        <h2 style="text-align:center; margin-bottom:20px;">Karta orqali to'lov</h2>
-        <div class="info-card">
-            <p>To'lov summasi:</p>
-            <h1 id="total-price" style="color:var(--accent); margin-bottom:15px;">0 so'm</h1>
-            <p>Karta: <b>8600 0000 0000 0000</b></p>
-            <p>Ega: <b>Shahriyor Allaberganov</b></p>
+        <div class="info-card" style="text-align:center;">
+            <p>Jami summa:</p>
+            <h1 id="price-tag" style="color:var(--accent); margin: 10px 0;">0 so'm</h1>
+            <p style="font-size:14px;">Karta: <b>8600 0000 0000 0000</b></p>
+            <p style="font-size:14px;">Ega: <b>Shahriyor Allaberganov</b></p>
             <hr style="opacity:0.1; margin:15px 0;">
-            <p style="font-size:13px; color:var(--secondary); line-height:1.5;">
-                ⚠️ To'lov qilganingizdan keyin adminga <a href="https://t.me/shakhriyarr" class="admin-link">(@shakhriyarr)</a> to'lov cheki va buyurtma raqamini yuboring!
+            <p style="font-size:13px; color:var(--secondary);">
+                To'lovdan so'ng adminga chek va buyurtma raqamini yuboring:
             </p>
+            <a href="https://t.me/shakhriyarr" class="admin-btn-link">@shakhriyarr 📨</a>
         </div>
-        <button class="btn-add" style="width:100%;" onclick="processOrder('Karta (Chek kutilmoqda)')">BUYURTMANI TASDIQLASH</button>
+        <button class="btn-add" style="width:100%;" onclick="finalProcess('Karta (Chek kutilmoqda)')">TASDIQLASH VA YUBORISH</button>
     </div>
 
     <div id="admin-panel" class="panel">
-        <h2 style="text-align:center; margin-bottom:20px;">Taom qo'shish</h2>
+        <h2 style="text-align:center; margin-bottom:20px;">Admin: Ovqat qo'shish</h2>
         <div class="info-card">
-            <input type="text" id="adm-name" placeholder="Taom nomi..." class="input-group" style="margin-bottom:10px;">
-            <input type="number" id="adm-price" placeholder="Narxi..." class="input-group">
-            <button class="btn-add" style="width:100%;" onclick="adminSend()">QO'SHISH</button>
+            <input type="text" id="food-name" placeholder="Nomi..." class="input-group">
+            <input type="number" id="food-price" placeholder="Narxi..." class="input-group">
+            <button class="btn-add" style="width:100%;" onclick="adminAdd()">QO'SHISH</button>
         </div>
+        <button onclick="switchPanel('user-panel')" style="background:none; border:none; color:var(--secondary); width:100%;">QAYTISH</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         let cart = [];
-        let uPhone = '';
-        let uAddress = '';
 
         function switchPanel(id) {
-            document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
-            document.getElementById(id).style.display = 'block';
-            if(id === 'user-panel') updateMainButton();
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'user-panel') updateMainBtn();
             else tg.MainButton.hide();
         }
 
-        function addToCart(name, price) {
-            cart.push({name, price});
-            tg.HapticFeedback.impactOccurred('medium');
-            updateMainButton();
+        function addToCart(n, p) {
+            cart.push({name: n, price: p});
+            tg.HapticFeedback.impactOccurred('light');
+            updateMainBtn();
         }
 
-        function updateMainButton() {
+        function updateMainBtn() {
             if(cart.length > 0) {
                 const total = cart.reduce((s, i) => s + i.price, 0);
-                tg.MainButton.setText(`DAVOM ETISH (${total.toLocaleString()} so'm)`).show();
+                tg.MainButton.setText(`SAVATCHA (${total.toLocaleString()} so'm)`).show();
             } else tg.MainButton.hide();
         }
 
-        tg.onEvent('mainButtonClicked', () => {
-            if(document.getElementById('user-panel').style.display === 'block') switchPanel('details-panel');
-        });
+        tg.onEvent('mainButtonClicked', () => switchPanel('details-panel'));
 
-        function saveDetails() {
-            uPhone = document.getElementById('user-phone').value;
-            uAddress = document.getElementById('user-address').value;
-            if(!uPhone || !uAddress) return tg.showAlert("Iltimos, ma'lumotlarni to'ldiring!");
+        function checkDetails() {
+            if(!document.getElementById('u-phone').value || !document.getElementById('u-address').value) {
+                return tg.showAlert("Ma'lumotlarni to'ldiring!");
+            }
+            const total = cart.reduce((s, i) => s + i.price, 0);
+            document.getElementById('price-tag').innerText = total.toLocaleString() + " so'm";
             switchPanel('payment-panel');
         }
 
-        function showCardPage() {
-            const total = cart.reduce((s, i) => s + i.price, 0);
-            document.getElementById('total-price').innerText = total.toLocaleString() + " so'm";
-            switchPanel('card-panel');
-        }
-
-        function processOrder(method) {
-            const total = cart.reduce((s, i) => s + i.price, 0);
+        function finalProcess(method) {
             const data = {
-                type: 'ORDER',
+                action: 'ORDER',
                 items: cart,
-                total: total,
-                payMethod: method,
-                phone: uPhone,
-                address: uAddress
+                total: cart.reduce((s, i) => s + i.price, 0),
+                method: method,
+                phone: document.getElementById('u-phone').value,
+                address: document.getElementById('u-address').value
             };
+            // TASDIQLASH OYNASISIZ TO'G'RI YUBORISH
             tg.sendData(JSON.stringify(data));
+            tg.close();
         }
 
-        function adminSend() {
-            const name = document.getElementById('adm-name').value;
-            const price = document.getElementById('adm-price').value;
+        function adminAdd() {
+            const name = document.getElementById('food-name').value;
+            const price = document.getElementById('food-price').value;
             if(!name || !price) return tg.showAlert("To'ldiring!");
-            tg.sendData(JSON.stringify({type: 'ADMIN_ADD', name, price}));
+            tg.sendData(JSON.stringify({action: 'ADMIN_ADD', name, price}));
+            tg.close();
         }
 
+        // Admin tugmasini chiqarish
         if(tg.initDataUnsafe.user && tg.initDataUnsafe.user.id === 8448862547) {
-            const ab = document.createElement('button');
-            ab.innerText = "ADMIN";
-            ab.style = "position:fixed; bottom:15px; right:15px; background:var(--accent); border:none; border-radius:10px; padding:10px; font-weight:bold; z-index:1000;";
-            ab.onclick = () => switchPanel('admin-panel');
-            document.body.appendChild(ab);
+            const b = document.createElement('button');
+            b.innerText = "⚙️";
+            b.style = "position:fixed; bottom:20px; left:20px; width:50px; height:50px; border-radius:50%; background:var(--accent); border:none; font-size:20px; z-index:1000;";
+            b.onclick = () => switchPanel('admin-panel');
+            document.body.appendChild(b);
         }
     </script>
 </body>
