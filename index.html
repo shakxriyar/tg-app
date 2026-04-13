@@ -16,7 +16,7 @@
             --success: #10b981;
             --danger: #ef4444;
             --gradient: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
         * {
@@ -27,11 +27,11 @@
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             padding: 15px;
-            padding-bottom: 120px; /* MainButton uchun joy */
+            padding-bottom: 120px;
             overflow-x: hidden;
         }
 
@@ -108,26 +108,16 @@
 
         .food-card:active { transform: scale(0.96); }
 
-        .food-emoji {
-            font-size: 55px;
-            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
-            transition: 0.3s;
-        }
-
-        .food-card:hover .food-emoji { transform: scale(1.1) rotate(5deg); }
+        .food-emoji { font-size: 55px; }
 
         .food-info { flex: 1; }
 
-        .food-info h3 {
-            font-size: 19px;
-            margin-bottom: 4px;
-        }
+        .food-info h3 { font-size: 19px; margin-bottom: 4px; }
 
         .food-info p {
             font-size: 13px;
             color: var(--secondary);
             margin-bottom: 15px;
-            line-height: 1.4;
         }
 
         .price-row {
@@ -136,11 +126,7 @@
             align-items: center;
         }
 
-        .price {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--accent);
-        }
+        .price { font-size: 18px; font-weight: 800; color: var(--accent); }
 
         .btn-add {
             background: var(--gradient);
@@ -149,40 +135,49 @@
             padding: 10px 20px;
             border-radius: 14px;
             font-weight: 800;
-            font-size: 14px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
         }
 
-        /* PAYMENT & ADMIN VIEWS */
-        .view-title {
-            font-size: 22px;
-            margin-bottom: 20px;
-            text-align: center;
-            color: var(--accent);
-        }
-
-        .method-card {
+        /* INFO CARDS (Admin/Card details) */
+        .info-card {
             background: var(--card);
-            padding: 25px;
-            border-radius: 22px;
-            margin-bottom: 15px;
-            border: 2px solid transparent;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.3s;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .method-card:active {
-            border-color: var(--accent);
-            background: rgba(56, 189, 248, 0.05);
+        .label { color: var(--secondary); font-size: 13px; margin-bottom: 5px; display: block; }
+        .value { font-size: 17px; font-weight: bold; margin-bottom: 15px; display: block; }
+
+        .copy-btn {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            border: 1px dashed var(--accent);
+            padding: 5px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .alert-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            padding: 15px;
+            border-radius: 20px;
+            color: var(--success);
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-top: 10px;
         }
 
         .stat-box {
@@ -191,8 +186,6 @@
             border-radius: 18px;
             text-align: center;
         }
-
-        .stat-box b { font-size: 20px; color: var(--success); }
     </style>
 </head>
 <body>
@@ -200,7 +193,7 @@
     <div id="user-panel" class="panel" style="display: block;">
         <header>
             <h1>SHOKH <span>FOOD</span></h1>
-            <p style="color: var(--secondary); font-size: 12px; letter-spacing: 1px;">PREMIUM QUALITY</p>
+            <p style="color: var(--secondary); font-size: 12px; letter-spacing: 1px;">PREMIUM QUALITY DELIVERY</p>
         </header>
 
         <div class="categories">
@@ -215,10 +208,10 @@
                 <div class="food-emoji">🍔</div>
                 <div class="food-info">
                     <h3>Burger Maxi</h3>
-                    <p>Go'shtli kotlet, pishloq, maxsus Shokh sousi va yangi salat.</p>
+                    <p>Go'shtli kotlet, cheddar pishlog'i va Shokh maxsus sousi.</p>
                     <div class="price-row">
                         <span class="price">45,000 so'm</span>
-                        <button class="btn-add" onclick="addToCart('Burger Maxi', 45000)">QO'SHISH</button>
+                        <button class="btn-add" onclick="addToCart('Burger Maxi', 45000)">+</button>
                     </div>
                 </div>
             </div>
@@ -227,10 +220,10 @@
                 <div class="food-emoji">🌯</div>
                 <div class="food-info">
                     <h3>Lavash Standart</h3>
-                    <p>Mol go'shti, chiplar, yangi pomidor va sous.</p>
+                    <p>Mol go'shti, chiplar, pomidor va maxsus ziravorlar.</p>
                     <div class="price-row">
                         <span class="price">32,000 so'm</span>
-                        <button class="btn-add" onclick="addToCart('Lavash Standart', 32000)">QO'SHISH</button>
+                        <button class="btn-add" onclick="addToCart('Lavash Standart', 32000)">+</button>
                     </div>
                 </div>
             </div>
@@ -242,7 +235,7 @@
                     <p>Muzdek va tetiklashtiruvchi ichimlik.</p>
                     <div class="price-row">
                         <span class="price">12,000 so'm</span>
-                        <button class="btn-add" onclick="addToCart('Coca-Cola 0.5L', 12000)">QO'SHISH</button>
+                        <button class="btn-add" onclick="addToCart('Coca-Cola 0.5L', 12000)">+</button>
                     </div>
                 </div>
             </div>
@@ -250,47 +243,79 @@
     </div>
 
     <div id="payment-panel" class="panel">
-        <h2 class="view-title">TO'LOV TURINI TANLANG</h2>
-        <div class="method-card" onclick="finishOrder('Naqd')">
-            <span style="font-size: 40px;">💵</span>
-            <h3>NAQD PUL</h3>
-            <p style="color: var(--secondary);">Kuryer yetkazganda to'lov</p>
+        <h2 style="text-align:center; margin-bottom:25px; color:var(--accent);">TO'LOV USULINI TANLANG</h2>
+        <div class="food-card" style="justify-content:center; text-align:center; cursor:pointer;" onclick="finishOrder('Naqd')">
+            <div>
+                <span style="font-size:45px;">💵</span>
+                <h3 style="margin-top:10px;">Naqd pul orqali</h3>
+                <p style="color:var(--secondary); font-size:12px;">Kuryerga beriladi</p>
+            </div>
         </div>
-        <div class="method-card" onclick="finishOrder('Karta')">
-            <span style="font-size: 40px;">💳</span>
-            <h3>KARTA ORQALI</h3>
-            <p style="color: var(--secondary);">Onlayn o'tkazma qilish</p>
+        <div class="food-card" style="justify-content:center; text-align:center; cursor:pointer;" onclick="showCardDetails()">
+            <div>
+                <span style="font-size:45px;">💳</span>
+                <h3 style="margin-top:10px;">Karta orqali</h3>
+                <p style="color:var(--secondary); font-size:12px;">Onlayn o'tkazma</p>
+            </div>
         </div>
-        <button class="btn-add" style="width: 100%; background: var(--card); color: white;" onclick="switchPanel('user-panel')">ORQAGA</button>
+        <button class="btn-add" style="width:100%; background:var(--card); color:white; height:55px;" onclick="switchPanel('user-panel')">ORQAGA QAYTISH</button>
+    </div>
+
+    <div id="card-details-panel" class="panel">
+        <h2 style="text-align:center; margin-bottom:20px; color:var(--accent);">TO'LOV MA'LUMOTLARI</h2>
+        
+        <div class="info-card">
+            <span class="label">To'lanadigan jami summa:</span>
+            <span class="value" id="final-sum" style="color:var(--accent); font-size:24px;">0 so'm</span>
+
+            <span class="label">Karta raqami:</span>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="value" id="card-number">8600 1234 5678 9012</span>
+                <button class="copy-btn" onclick="copyText('8600123456789012')">NUSXA OLISH</button>
+            </div>
+
+            <span class="label">Karta egasi:</span>
+            <span class="value">Shahriyor Allaberganov</span>
+
+            <span class="label">Admin bilan bog'lanish:</span>
+            <span class="value">@shakhriyarr</span>
+        </div>
+
+        <div class="alert-box">
+            ⚠️ <b>MUHIM:</b> To'lovni amalga oshirgach, chekni va buyurtma raqamini adminga (<a href="https://t.me/shakhriyarr" style="color:var(--success); text-decoration:none;">@shakhriyarr</a>) yuboring!
+        </div>
+
+        <button class="btn-add" style="width:100%; height:55px; margin-bottom:10px;" onclick="finishOrder('Karta (O\'tkazma kutilmoqda)')">BUYURTMANI TASDIQLASH</button>
+        <button class="btn-add" style="width:100%; background:var(--card); color:white; height:50px;" onclick="switchPanel('payment-panel')">ORQAGA</button>
     </div>
 
     <div id="admin-panel" class="panel">
-        <h2 class="view-title">ADMIN BOSHQARUVI</h2>
-        <div class="card">
-            <h3>📊 Statistika</h3>
+        <h2 style="text-align:center; margin-bottom:20px; color:var(--accent);">ADMIN PANELI</h2>
+        <div class="info-card">
+            <h3>📊 Bugungi Statistika</h3>
             <div class="stats-grid">
-                <div class="stat-box"><small>Tushum</small><br><b>2.4 mln</b></div>
-                <div class="stat-box"><small>Soni</small><br><b>42 ta</b></div>
+                <div class="stat-box"><small>Tushum</small><br><b style="color:var(--success);">2.4 mln</b></div>
+                <div class="stat-box"><small>Buyurtmalar</small><br><b style="color:var(--accent);">42 ta</b></div>
             </div>
         </div>
-        <div class="card">
-            <h3>⚙️ Sozlamalar</h3>
-            <button class="btn-add" style="width: 100%; margin-top: 10px;">TAOM QO'SHISH</button>
-            <button class="btn-add" style="width: 100%; margin-top: 10px; background: var(--danger);">STOP LIST</button>
+        <div class="info-card">
+            <h3>⚙️ Boshqaruv</h3>
+            <button class="btn-add" style="width: 100%; margin-top: 15px;">YANGI TAOM QO'SHISH</button>
+            <button class="btn-add" style="width: 100%; margin-top: 10px; background:var(--danger); color:white;">STOP LIST (O'CHIRISH)</button>
         </div>
     </div>
 
     <div id="courier-panel" class="panel">
-        <h2 class="view-title" style="color: var(--success);">KURYER PORTALI</h2>
-        <div class="card">
+        <h2 style="text-align:center; margin-bottom:20px; color:var(--success);">KURYER PORTALI</h2>
+        <div class="info-card">
             <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                <b>Buyurtma #1092</b>
-                <span style="color: var(--success);">YANGI</span>
+                <b>Buyurtma #SH-9921</b>
+                <span style="color: var(--success); font-weight:bold;">YANGI</span>
             </div>
-            <p>📍 Manzil: Chilonzor, 10-kvartal</p>
-            <p>💰 To'lov: 75,000 so'm (Karta)</p>
+            <p style="margin-bottom:10px;">📍 <b>Manzil:</b> Toshkent, Chilonzor 10</p>
+            <p style="margin-bottom:10px;">💰 <b>Summa:</b> 75,000 so'm (Karta)</p>
             <hr style="opacity:0.1; margin: 15px 0;">
-            <button class="btn-add" style="width: 100%; background: var(--success);" onclick="tg.showAlert('Mijozga yo\'lga chiqqaningiz aytildi!')">QABUL QILISH ✅</button>
+            <button class="btn-add" style="width: 100%; background: var(--success); height:50px;" onclick="tg.showAlert('Mijozga yo\'lga chiqqaningiz haqida xabar yuborildi!')">BUYURTMANI QABUL QILISH ✅</button>
         </div>
     </div>
 
@@ -298,22 +323,24 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         
-        // ADMIN VA KURYER ID LARINI O'ZINGIZNIKI BILAN ALMASTIRING
+        // --- KONFIGURATSIYA ---
         const ADMIN_ID = 8448862547;
-        const COURIER_ID = 7312694067;
+        const COURIER_ID = 7312694067; 
         const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 0;
 
         let cart = [];
 
-        // 1. PANEL BOSHQARUVI
+        // --- PANEL BOSHQARUVI ---
         function switchPanel(panelId) {
             document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
-            document.getElementById(panelId).style.display = 'block';
+            const target = document.getElementById(panelId);
+            if(target) target.style.display = 'block';
+            
             if(panelId === 'user-panel') updateMainButton();
             else tg.MainButton.hide();
         }
 
-        // Foydalanuvchi ID bo'yicha panelni ochish
+        // Kirishda foydalanuvchini aniqlash
         if (userId === ADMIN_ID) {
             switchPanel('admin-panel');
         } else if (userId === COURIER_ID) {
@@ -322,23 +349,25 @@
             switchPanel('user-panel');
         }
 
-        // 2. KATEGORIYA FILTRI
+        // --- KATEGORIYA FILTRI ---
         function filterMenu(cat, el) {
             document.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
             
             const items = document.querySelectorAll('.food-card');
             items.forEach(item => {
-                if(cat === 'all' || item.dataset.category === cat) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
+                if(item.dataset.category) {
+                    if(cat === 'all' || item.dataset.category === cat) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
                 }
             });
             tg.HapticFeedback.impactOccurred('light');
         }
 
-        // 3. SAVATCHA MANTIQI
+        // --- SAVATCHA MANTIQLARI ---
         function addToCart(name, price) {
             cart.push({name, price});
             tg.HapticFeedback.notificationOccurred('success');
@@ -348,7 +377,7 @@
         function updateMainButton() {
             if (cart.length > 0) {
                 const total = cart.reduce((s, i) => s + i.price, 0);
-                tg.MainButton.setText(`BUYURTMA BERISH (${total.toLocaleString()} so'm)`);
+                tg.MainButton.setText(`TASDIQLASH (${total.toLocaleString()} so'm)`);
                 tg.MainButton.show();
                 tg.MainButton.setParams({ color: '#38bdf8', text_color: '#000000' });
             } else {
@@ -356,21 +385,42 @@
             }
         }
 
-        // 4. TO'LOVGA O'TISH
+        // Telegram MainButton bosilganda to'lovga o'tish
         tg.onEvent('mainButtonClicked', function() {
             switchPanel('payment-panel');
         });
 
-        // 5. YAKUNLASH
+        // --- TO'LOV TAFSILOTLARI ---
+        function showCardDetails() {
+            const total = cart.reduce((s, i) => s + i.price, 0);
+            document.getElementById('final-sum').innerText = total.toLocaleString() + " so'm";
+            switchPanel('card-details-panel');
+        }
+
+        function copyText(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            tg.showAlert("Karta raqami nusxalandi! Endi to'lov qilishingiz mumkin.");
+        }
+
+        // --- YAKUNIY BUYURTMA YUBORISH ---
         function finishOrder(method) {
             const total = cart.reduce((s, i) => s + i.price, 0);
-            const orderData = {
+            const orderId = Math.floor(100000 + Math.random() * 900000); 
+            
+            const resultData = {
+                orderId: orderId,
                 items: cart,
                 total: total,
-                payment: method
+                method: method
             };
-            // Ma'lumotni botga yuborish
-            tg.sendData(JSON.stringify(orderData));
+            
+            // Botga yuborish
+            tg.sendData(JSON.stringify(resultData));
         }
     </script>
 </body>
