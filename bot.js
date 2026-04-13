@@ -1,58 +1,66 @@
-const { Telegraf, Markup } = require('telegraf');
-const bot = new Telegraf('Sizning_Bot_Tokeningiz');
+const TelegramBot = require('node-telegram-bot-api');
 
-const ADMIN_ID = 8448862547; // Sizning ID
-const WEB_APP_URL = 'https://shakxriyarr-commits.github.io/tg-app/';
+// MA'LUMOTLAR
+const token = '8664449888:AAFh_QEzGrqYLRbZESRWPG9Twwx60KmmgQk'; // BotFather'dan olingan token
+const bot = new TelegramBot(token, {polling: true});
 
-bot.start((ctx) => {
-    ctx.reply(`Assalomu alaykum, ${ctx.from.first_name}! Shokh Food botiga xush kelibsiz.`, 
-        Markup.keyboard([
-            [Markup.button.webApp("🍴 Menyuni ochish", WEB_APP_URL)]
-        ]).resize()
-    );
+const ADMIN_ID = 8448862547;
+const COURIER_ID = 7312694067;
+
+// START BUYRUG'I
+bot.onText(/\/start/, (msg) => {
+    const chatId = msg.chat.id;
+    bot.sendMessage(chatId, `Assalomu alaykum, ${msg.from.first_name}!\nShokh Food botiga xush kelibsiz!`, {
+        reply_markup: {
+            keyboard: [
+                [{ text: "🛒 Menyu / Buyurtma berish", web_app: { url: "YOUR_GITHUB_PAGES_URL" } }]
+            ],
+            resize_keyboard: true
+        }
+    });
 });
 
-// Mini Appdan ma'lumot kelishi
-bot.on('web_app_data', async (ctx) => {
-    try {
-        const data = JSON.parse(ctx.webAppData.data());
-        let text = "🛒 Savatchangiz:\n\n";
-        data.items.forEach(i => text += `• ${i.name} - ${i.price.toLocaleString()} so'm\n`);
-        text += `\n💰 Jami: ${data.total.toLocaleString()} so'm\n💳 To'lov: ${data.method}`;
+// WEB APP'DAN KELADIGAN MA'LUMOTLARNI TUTISH
+bot.on('web_app_data', async (msg) => {
+    const chatId = msg.chat.id;
+    const rawData = msg.web_app_data.data;
+    const data = JSON.parse(rawData);
 
-        // Ma'lumotni saqlab qo'yamiz va telefon so'raymiz
-        ctx.reply(text + "\n\nIltimos, telefon raqamingizni yuboring:", 
-            Markup.keyboard([[Markup.button.contactRequest("📞 Raqamni yuborish")]]).oneTime().resize()
-        );
+    // 1. AGAR YANGI BUYURTMA BO'LSA
+    if (data.action === 'NEW_ORDER') {
+        let itemsString = data.items.map(i => `• ${i.name} - ${i.price.toLocaleString()} so'm`).join('\n');
         
-        // Keyingi qadamlar uchun vaqtincha ma'lumotni sessionga qo'shish (ixtiyoriy)
-        bot.tempData = { orderText: text }; 
-    } catch (e) {
-        ctx.reply("Ma'lumotlarni qayta ishlashda xatolik.");
+        const report = `🔔 YANGI BUYURTMA!\n\n` +
+                       `👤 Mijoz: ${data.user.first_name} (@${data.user.username || 'yoq'})\n` +
+                       `🆔 ID: ${data.user.id}\n\n` +
+                       `📦 Taomlar:\n${itemsString}\n\n` +
+                       `💰 Jami summa: ${data.total.toLocaleString()} so'm\n` +
+                       `💳 To'lov turi: ${data.method}`;
+
+        // Mijozga xabar
+        await bot.sendMessage(chatId, `✅ Buyurtmangiz qabul qilindi!\nID: #${Math.floor(Math.random()*1000)}\n\nAdmin tez orada bog'lanadi.`);
+
+        // Adminga (Sizga) xabar
+        await bot.sendMessage(ADMIN_ID, report);
+
+        // Kuryerga xabar
+        await bot.sendMessage(COURIER_ID, report + `\n\n📍 Iltimos, mijoz bilan bog'lanib manzilni aniqlang!`);
+    }
+
+    // 2. AGAR ADMIN TAOM QO'SHSA
+    if (data.action === 'ADD_FOOD') {
+        const adminMsg = `🍱 YANGI TAOM QO'SHILDI:\n\n` +
+                         `Nomi: ${data.foodName}\n` +
+                         `Narxi: ${data.foodPrice} so'm\n` +
+                         `Kategoriya: ${data.foodCategory}`;
+        
+        await bot.sendMessage(ADMIN_ID, adminMsg);
     }
 });
 
-// Raqam kelganda lokatsiya so'rash
-bot.on('contact', (ctx) => {
-    bot.tempData.phone = ctx.message.contact.phone_number;
-    ctx.reply("Rahmat! Endi manzilingizni (Lokatsiya) yuboring:", 
-        Markup.keyboard([[Markup.button.locationRequest("📍 Lokatsiyani yuborish")]]).oneTime().resize()
-    );
+// XATOLIKLARNI TEKSHIRISH
+bot.on('polling_error', (error) => {
+    console.error("Botda xatolik:", error);
 });
 
-// Lokatsiya kelganda hammasini Adminga yuborish
-bot.on('location', async (ctx) => {
-    const loc = ctx.message.location;
-    const finalMsg = `🆕 YANGI BUYURTMA!\n\n${bot.tempData.orderText}\n👤 Mijoz: ${ctx.from.first_name}\n📞 Tel: ${bot.tempData.phone}`;
-
-    // Adminga yuborish
-    await bot.telegram.sendMessage(ADMIN_ID, finalMsg);
-    await bot.telegram.sendLocation(ADMIN_ID, loc.latitude, loc.longitude);
-
-    ctx.reply("✅ Buyurtmangiz qabul qilindi! Tez orada kuryer bog'lanadi.", 
-        Markup.keyboard([[Markup.button.webApp("🍴 Menyu", WEB_APP_URL)]]).resize()
-    );
-});
-
-bot.launch();
-console.log("Shokh Bot ishga tushdi!");
+console.log("Bot muvaffaqiyatli ishlamoqda...");
