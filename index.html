@@ -12,178 +12,183 @@
             --accent: #38bdf8;
             --text: #f8fafc;
             --secondary: #94a3b8;
-            --success: #4ade80;
+            --success: #10b981;
+            --danger: #ef4444;
+            --gradient: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
-            margin: 0;
-            padding: 15px;
-            padding-bottom: 120px;
+            margin: 0; padding: 15px; padding-bottom: 100px;
+            overflow-x: hidden;
         }
 
-        .panel { display: none; }
+        .panel { display: none; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Mijoz Paneli Elementlari */
-        .category-scroll {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .cat-btn {
-            background: var(--card);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 8px 20px;
-            border-radius: 20px;
-            white-space: nowrap;
-            font-size: 14px;
-        }
-
-        .food-card {
+        /* Luxury Card Styles */
+        .card {
             background: var(--card);
             border-radius: 24px;
-            overflow: hidden;
+            padding: 20px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        .food-img {
-            width: 100%;
-            height: 160px;
-            background: #2d3748;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-        }
-        .food-info { padding: 15px; }
-        .food-info h3 { margin: 0; font-size: 20px; }
-        .food-info p { color: var(--secondary); font-size: 14px; margin: 5px 0 15px 0; }
-        
-        .flex-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .btn-add {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 12px;
-            font-weight: bold;
+        @media (hover: hover) {
+            .card:hover {
+                border-color: var(--accent);
+                box-shadow: 0 10px 30px rgba(56, 189, 248, 0.15);
+                transform: translateY(-5px);
+            }
         }
 
-        /* Savatcha (Floating Cart) */
-        .cart-float {
-            position: fixed;
-            bottom: 20px;
-            left: 15px;
-            right: 15px;
-            background: var(--accent);
-            color: #000;
-            padding: 15px;
-            border-radius: 16px;
-            display: none;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
+        /* Food Items Design */
+        .food-item { display: flex; align-items: center; gap: 15px; }
+        .food-emoji { font-size: 50px; transition: transform 0.3s ease; }
+        .card:hover .food-emoji { transform: scale(1.2) rotate(10deg); }
+
+        .price-tag {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--accent);
         }
 
-        /* Admin/Kuryer uchun maxsus dizayn */
-        .badge { background: rgba(56, 189, 248, 0.1); color: var(--accent); padding: 5px 12px; border-radius: 10px; font-size: 12px; }
+        /* Buttons */
+        .btn {
+            background: var(--gradient);
+            color: #000; border: none;
+            padding: 12px 25px; border-radius: 16px;
+            font-weight: 900; cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn:active { transform: scale(0.95); }
+
+        /* Categories Scroll */
+        .categories {
+            display: flex; gap: 10px; overflow-x: auto;
+            padding-bottom: 20px; scrollbar-width: none;
+        }
+        .cat {
+            background: var(--card); padding: 8px 18px;
+            border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);
+            white-space: nowrap; font-size: 14px;
+        }
+        .cat.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+        /* Checkout View */
+        #payment-view { text-align: center; }
+        .method-card {
+            padding: 25px; cursor: pointer; margin-top: 15px;
+            border: 2px solid transparent;
+        }
+        .method-card.selected { border-color: var(--accent); background: rgba(56, 189, 248, 0.1); }
+
     </style>
 </head>
 <body>
 
     <div id="user-panel" class="panel">
         <header style="margin-bottom: 20px;">
-            <h1 style="margin: 0; color: var(--accent);">SHOKH FOOD</h1>
-            <p style="color: var(--secondary); margin: 5px 0;">Premium ta'm, tezkor xizmat</p>
+            <h1 style="margin: 0; letter-spacing: 2px;">SHOKH <span style="color: var(--accent);">FOOD</span></h1>
+            <p style="color: var(--secondary); font-size: 12px;">Premium yetkazib berish xizmati</p>
         </header>
 
-        <div class="category-scroll">
-            <div class="cat-btn">🍔 Burgerlar</div>
-            <div class="cat-btn">🌯 Lavash</div>
-            <div class="cat-btn">🥤 Ichimliklar</div>
+        <div class="categories">
+            <div class="cat active">Hammasi</div>
+            <div class="cat">🍔 Burgerlar</div>
+            <div class="cat">🌯 Lavashlar</div>
+            <div class="cat">🥤 Ichimliklar</div>
         </div>
 
-        <div id="menu-items">
-            <div class="food-card">
-                <div class="food-img">🍔</div>
-                <div class="food-info">
-                    <h3>Burger Maxi</h3>
-                    <p>Go'sht, cheddar pishlog'i, marinadlangan bodring va maxsus Shokh sousi.</p>
-                    <div class="flex-row">
-                        <span style="font-size: 20px; font-weight: bold;">45,000 so'm</span>
-                        <button class="btn-add" onclick="addToCart('Burger Maxi', 45000)">QO'SHISH</button>
+        <div id="main-menu">
+            <div class="card food-item">
+                <div class="food-emoji">🍔</div>
+                <div style="flex: 1;">
+                    <h3 style="margin: 0;">Burger Maxi</h3>
+                    <p style="color: var(--secondary); font-size: 13px; margin: 5px 0;">Go'sht, cheddar, Shokh sousi</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="price-tag">45,000</span>
+                        <button class="btn" onclick="addToCart('Burger Maxi', 45000)">+</button>
                     </div>
                 </div>
             </div>
 
-            <div class="food-card">
-                <div class="food-img">🌯</div>
-                <div class="food-info">
-                    <h3>Lavash Standart</h3>
-                    <p>Mol go'shti, chiplar, pomidor va o'ziga xos ziravorlar.</p>
-                    <div class="flex-row">
-                        <span style="font-size: 20px; font-weight: bold;">32,000 so'm</span>
-                        <button class="btn-add" onclick="addToCart('Lavash Standart', 32000)">QO'SHISH</button>
+            <div class="card food-item">
+                <div class="food-emoji">🌯</div>
+                <div style="flex: 1;">
+                    <h3 style="margin: 0;">Lavash Standart</h3>
+                    <p style="color: var(--secondary); font-size: 13px; margin: 5px 0;">Mol go'shti, chiplar, pomidor</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="price-tag">32,000</span>
+                        <button class="btn" onclick="addToCart('Lavash Standart', 32000)">+</button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="cart-float" id="cart-float" onclick="checkout()">
-            <span>SAVATCHA (<span id="cart-count">0</span>)</span>
-            <span id="cart-total">0 so'm</span>
+    <div id="payment-view" class="panel">
+        <h2>To'lov turini tanlang</h2>
+        <div class="card method-card" onclick="setPayment('Naqd')">
+            <h3 style="margin: 0;">💵 Naqd pul</h3>
         </div>
+        <div class="card method-card" onclick="setPayment('Karta')">
+            <h3 style="margin: 0;">💳 Karta orqali</h3>
+        </div>
+        <button class="btn" style="margin-top: 20px; background: var(--secondary);" onclick="backToMenu()">Orqaga</button>
     </div>
 
     <div id="admin-panel" class="panel">
-        <h1 style="color: #f87171;">ADMIN PANEL</h1>
-        <div style="background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
-            <h3>Kunlik natija</h3>
-            <h2 style="color: var(--success); margin: 0;">2,450,000 so'm</h2>
-            <p style="color: var(--secondary);">Bugun 34 ta buyurtma berildi</p>
+        <h1 style="color: var(--accent);">ADMIN DASHBOARD</h1>
+        <div class="card">
+            <h4 style="margin: 0; color: var(--secondary);">Bugungi tushum</h4>
+            <h2 style="margin: 10px 0;">2,450,000 so'm</h2>
+            <div style="display: flex; gap: 10px;">
+                <span style="color: var(--success);">+12% kechagiga qaraganda</span>
+            </div>
         </div>
-        <br>
-        <button class="btn-add" style="width: 100%;" onclick="tg.showAlert('Tez orada taom tahrirlash qo\'shiladi')">TAOM QO'SHISH</button>
+        <div class="card">
+            <h3>Taomlarni boshqarish</h3>
+            <button class="btn" style="width: 100%;">➕ Yangi taom qo'shish</button>
+        </div>
     </div>
 
     <div id="courier-panel" class="panel">
-        <h1 style="color: var(--success);">KURYER PORTALI</h1>
-        <div style="background: var(--card); padding: 20px; border-radius: 20px; margin-bottom: 15px;">
-            <div class="flex-row">
-                <span class="badge">YANGI</span>
-                <b>#1025-Buyurtma</b>
+        <h1 style="color: var(--success);">KURYER ISH JOYI</h1>
+        <div class="card">
+            <div style="display: flex; justify-content: space-between;">
+                <b>Buyurtma #1085</b>
+                <span style="color: var(--success);">YANGI</span>
             </div>
-            <p>📍 Manzil: Yunusobod 4-kvartal</p>
-            <p>💰 To'lov: 77,000 (Naqd)</p>
-            <button class="btn-add" style="width: 100%; background: var(--success);" onclick="tg.showAlert('Mijozga xabar yuborildi!')">TOPShIRDIM ✅</button>
+            <hr style="opacity: 0.1; margin: 15px 0;">
+            <p>📍 Manzil: Chilonzor, 10-kvartal</p>
+            <p>💰 Summa: 77,000 (Karta)</p>
+            <button class="btn" style="width: 100%;" onclick="tg.showAlert('Mijozga yo\'lga chiqqaningiz haqida xabar yuborildi!')">QABUL QILISh</button>
         </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-
+        
+        // ADMIN VA KURYER ID LARINI O'ZINGIZNIKI BILAN ALMASTIRING
         const ADMIN_ID = 8448862547;
-        const COURIER_ID = 7312694067;
-        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 0;
-
+        const COURIER_ID = 7312694067; 
+        
+        const currentUserId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 0;
         let cart = [];
+        let selectedMethod = "";
 
-        // Panellarni boshqarish
-        if (userId === ADMIN_ID) {
+        // Panelni aniqlash
+        if (currentUserId === ADMIN_ID) {
             document.getElementById('admin-panel').style.display = 'block';
-        } else if (userId === COURIER_ID) {
+        } else if (currentUserId === COURIER_ID) {
             document.getElementById('courier-panel').style.display = 'block';
         } else {
             document.getElementById('user-panel').style.display = 'block';
@@ -191,31 +196,55 @@
 
         function addToCart(name, price) {
             cart.push({name, price});
-            tg.HapticFeedback.impactOccurred('light');
-            updateCart();
+            tg.HapticFeedback.impactOccurred('medium');
+            updateMainButton();
         }
 
-        function updateCart() {
-            const float = document.getElementById('cart-float');
-            const count = document.getElementById('cart-count');
-            const total = document.getElementById('cart-total');
-
+        function updateMainButton() {
             if (cart.length > 0) {
-                float.style.display = 'flex';
-                count.innerText = cart.length;
-                const sum = cart.reduce((a, b) => a + b.price, 0);
-                total.innerText = sum.toLocaleString() + " so'm";
+                const total = cart.reduce((s, i) => s + i.price, 0);
+                tg.MainButton.setText(`TASDIQLASH (${total.toLocaleString()} so'm)`);
+                tg.MainButton.show();
+            } else {
+                tg.MainButton.hide();
             }
         }
 
-        function checkout() {
-            const sum = cart.reduce((a, b) => a + b.price, 0);
-            tg.sendData(JSON.stringify({
-                action: 'order',
+        tg.onEvent('mainButtonClicked', function() {
+            document.getElementById('user-panel').style.display = 'none';
+            document.getElementById('payment-view').style.display = 'block';
+            tg.MainButton.hide();
+        });
+
+        function setPayment(method) {
+            selectedMethod = method;
+            const total = cart.reduce((s, i) => s + i.price, 0);
+            const data = {
                 items: cart,
-                total: sum
-            }));
+                total: total,
+                payment: method
+            };
+            tg.sendData(JSON.stringify(data));
         }
+
+        function backToMenu() {
+            document.getElementById('payment-view').style.display = 'none';
+            document.getElementById('user-panel').style.display = 'block';
+            updateMainButton();
+        }
+
+        function finalCheckout(method) {
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            const orderData = {
+                items: cart,
+                total: total,
+                method: method
+            };
+            
+            // Ma'lumotni botga yuborish
+            tg.sendData(JSON.stringify(orderData));
+        }
+
     </script>
 </body>
 </html>
