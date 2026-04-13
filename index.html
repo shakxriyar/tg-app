@@ -38,6 +38,7 @@
             align-items: center;
             gap: 15px;
             transition: var(--transition);
+            cursor: pointer;
         }
         .food-card:hover { transform: translateY(-5px); border-color: var(--accent); }
 
@@ -53,7 +54,6 @@
         }
 
         .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 5px; color: var(--secondary); font-size: 12px; }
         input {
             width: 100%;
             padding: 15px;
@@ -67,6 +67,13 @@
         input:focus { border-color: var(--accent); }
 
         .info-card { background: var(--card); border-radius: 25px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        
+        .admin-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 1px dashed var(--accent);
+        }
     </style>
 </head>
 <body>
@@ -82,23 +89,21 @@
                 </div>
                 <button class="btn-add" onclick="addToCart('Burger Maxi', 45000)">+</button>
             </div>
-        </div>
+            </div>
     </div>
 
     <div id="details-panel" class="panel">
-        <h2 style="text-align:center; margin-bottom:20px;">Ma'lumotlaringiz</h2>
+        <h2 style="text-align:center; margin-bottom:20px;">Yetkazish ma'lumotlari</h2>
         <div class="info-card">
             <div class="input-group">
-                <label>Telefon raqam:</label>
-                <input type="tel" id="user-phone" placeholder="+998 90 123 45 67">
+                <input type="tel" id="user-phone" placeholder="Telefon (masalan: +998901234567)">
             </div>
             <div class="input-group">
-                <label>Yetkazish manzili:</label>
-                <input type="text" id="user-address" placeholder="Ko'cha, uy, kvartira...">
+                <input type="text" id="user-address" placeholder="Manzil (Ko'cha, uy, mo'ljal)">
             </div>
             <button class="btn-add" style="width:100%;" onclick="saveDetails()">DAVOM ETISH</button>
         </div>
-        <button class="btn-add" style="width:100%; background:var(--card); color:white;" onclick="switchPanel('user-panel')">ORQAGA</button>
+        <button class="btn-add" style="width:100%; background:transparent; color:var(--secondary);" onclick="switchPanel('user-panel')">ORQAGA</button>
     </div>
 
     <div id="payment-panel" class="panel">
@@ -111,36 +116,39 @@
             <span style="font-size:40px;">💳</span>
             <h3>Karta orqali</h3>
         </div>
-        <button class="btn-add" style="width:100%; background:var(--card); color:white;" onclick="switchPanel('details-panel')">ORQAGA</button>
+        <button class="btn-add" style="width:100%; background:transparent; color:var(--secondary);" onclick="switchPanel('details-panel')">ORQAGA</button>
     </div>
 
     <div id="card-panel" class="panel">
+        <h2 style="text-align:center; margin-bottom:20px;">Karta orqali to'lov</h2>
         <div class="info-card">
             <p>To'lov summasi:</p>
-            <h1 id="total-price" style="color:var(--accent);">0 so'm</h1>
-            <hr style="opacity:0.1; margin:15px 0;">
-            <p>Karta raqami: <b>8600 0000 0000 0000</b></p>
+            <h1 id="total-price" style="color:var(--accent); margin-bottom:15px;">0 so'm</h1>
+            <p>Karta: <b>8600 0000 0000 0000</b></p>
             <p>Ega: <b>Shahriyor Allaberganov</b></p>
+            <hr style="opacity:0.1; margin:15px 0;">
+            <p style="font-size:13px; color:var(--secondary); line-height:1.5;">
+                ⚠️ To'lov qilganingizdan keyin adminga <a href="https://t.me/shakhriyarr" class="admin-link">(@shakhriyarr)</a> to'lov cheki va buyurtma raqamini yuboring!
+            </p>
         </div>
         <button class="btn-add" style="width:100%;" onclick="processOrder('Karta (Chek kutilmoqda)')">BUYURTMANI TASDIQLASH</button>
     </div>
 
     <div id="admin-panel" class="panel">
-        <h2 style="text-align:center; margin-bottom:20px;">Admin: Taom Qo'shish</h2>
+        <h2 style="text-align:center; margin-bottom:20px;">Taom qo'shish</h2>
         <div class="info-card">
-            <input type="text" id="adm-name" placeholder="Nomi..." class="input-group"><br>
+            <input type="text" id="adm-name" placeholder="Taom nomi..." class="input-group" style="margin-bottom:10px;">
             <input type="number" id="adm-price" placeholder="Narxi..." class="input-group">
             <button class="btn-add" style="width:100%;" onclick="adminSend()">QO'SHISH</button>
         </div>
-        <button class="btn-add" style="width:100%; background:var(--card); color:white;" onclick="switchPanel('user-panel')">MENYUGA QAYTISH</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         let cart = [];
-        let userPhone = '';
-        let userAddress = '';
+        let uPhone = '';
+        let uAddress = '';
 
         function switchPanel(id) {
             document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
@@ -158,16 +166,18 @@
         function updateMainButton() {
             if(cart.length > 0) {
                 const total = cart.reduce((s, i) => s + i.price, 0);
-                tg.MainButton.setText(`BUYURTMA BERISH (${total.toLocaleString()} so'm)`).show();
+                tg.MainButton.setText(`DAVOM ETISH (${total.toLocaleString()} so'm)`).show();
             } else tg.MainButton.hide();
         }
 
-        tg.onEvent('mainButtonClicked', () => switchPanel('details-panel'));
+        tg.onEvent('mainButtonClicked', () => {
+            if(document.getElementById('user-panel').style.display === 'block') switchPanel('details-panel');
+        });
 
         function saveDetails() {
-            userPhone = document.getElementById('user-phone').value;
-            userAddress = document.getElementById('user-address').value;
-            if(!userPhone || !userAddress) return tg.showAlert("Ma'lumotlarni to'ldiring!");
+            uPhone = document.getElementById('user-phone').value;
+            uAddress = document.getElementById('user-address').value;
+            if(!uPhone || !uAddress) return tg.showAlert("Iltimos, ma'lumotlarni to'ldiring!");
             switchPanel('payment-panel');
         }
 
@@ -180,13 +190,12 @@
         function processOrder(method) {
             const total = cart.reduce((s, i) => s + i.price, 0);
             const data = {
-                type: 'NEW_ORDER',
+                type: 'ORDER',
                 items: cart,
                 total: total,
-                method: method,
-                phone: userPhone,
-                address: userAddress,
-                user: tg.initDataUnsafe.user
+                payMethod: method,
+                phone: uPhone,
+                address: uAddress
             };
             tg.sendData(JSON.stringify(data));
         }
@@ -195,17 +204,15 @@
             const name = document.getElementById('adm-name').value;
             const price = document.getElementById('adm-price').value;
             if(!name || !price) return tg.showAlert("To'ldiring!");
-            tg.sendData(JSON.stringify({type: 'ADD_FOOD', name, price}));
+            tg.sendData(JSON.stringify({type: 'ADMIN_ADD', name, price}));
         }
 
-        // Admin tugmasi
         if(tg.initDataUnsafe.user && tg.initDataUnsafe.user.id === 8448862547) {
-            const abtn = document.createElement('button');
-            abtn.innerText = "ADMIN";
-            abtn.className = "btn-add";
-            abtn.style = "position:fixed; bottom:10px; right:10px; opacity:0.7;";
-            abtn.onclick = () => switchPanel('admin-panel');
-            document.body.appendChild(abtn);
+            const ab = document.createElement('button');
+            ab.innerText = "ADMIN";
+            ab.style = "position:fixed; bottom:15px; right:15px; background:var(--accent); border:none; border-radius:10px; padding:10px; font-weight:bold; z-index:1000;";
+            ab.onclick = () => switchPanel('admin-panel');
+            document.body.appendChild(ab);
         }
     </script>
 </body>
