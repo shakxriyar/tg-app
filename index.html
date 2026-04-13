@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Shokh Food Premium</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --text: #f8fafc;
+            --secondary: #94a3b8;
+            --success: #4ade80;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 15px;
+            padding-bottom: 120px;
+        }
+
+        .panel { display: none; }
+
+        /* Mijoz Paneli Elementlari */
+        .category-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .cat-btn {
+            background: var(--card);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 20px;
+            border-radius: 20px;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
+        .food-card {
+            background: var(--card);
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .food-img {
+            width: 100%;
+            height: 160px;
+            background: #2d3748;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+        }
+        .food-info { padding: 15px; }
+        .food-info h3 { margin: 0; font-size: 20px; }
+        .food-info p { color: var(--secondary); font-size: 14px; margin: 5px 0 15px 0; }
+        
+        .flex-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-add {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        /* Savatcha (Floating Cart) */
+        .cart-float {
+            position: fixed;
+            bottom: 20px;
+            left: 15px;
+            right: 15px;
+            background: var(--accent);
+            color: #000;
+            padding: 15px;
+            border-radius: 16px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
+        }
+
+        /* Admin/Kuryer uchun maxsus dizayn */
+        .badge { background: rgba(56, 189, 248, 0.1); color: var(--accent); padding: 5px 12px; border-radius: 10px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <div id="user-panel" class="panel">
+        <header style="margin-bottom: 20px;">
+            <h1 style="margin: 0; color: var(--accent);">SHOKH FOOD</h1>
+            <p style="color: var(--secondary); margin: 5px 0;">Premium ta'm, tezkor xizmat</p>
+        </header>
+
+        <div class="category-scroll">
+            <div class="cat-btn">🍔 Burgerlar</div>
+            <div class="cat-btn">🌯 Lavash</div>
+            <div class="cat-btn">🥤 Ichimliklar</div>
+        </div>
+
+        <div id="menu-items">
+            <div class="food-card">
+                <div class="food-img">🍔</div>
+                <div class="food-info">
+                    <h3>Burger Maxi</h3>
+                    <p>Go'sht, cheddar pishlog'i, marinadlangan bodring va maxsus Shokh sousi.</p>
+                    <div class="flex-row">
+                        <span style="font-size: 20px; font-weight: bold;">45,000 so'm</span>
+                        <button class="btn-add" onclick="addToCart('Burger Maxi', 45000)">QO'SHISH</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="food-card">
+                <div class="food-img">🌯</div>
+                <div class="food-info">
+                    <h3>Lavash Standart</h3>
+                    <p>Mol go'shti, chiplar, pomidor va o'ziga xos ziravorlar.</p>
+                    <div class="flex-row">
+                        <span style="font-size: 20px; font-weight: bold;">32,000 so'm</span>
+                        <button class="btn-add" onclick="addToCart('Lavash Standart', 32000)">QO'SHISH</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cart-float" id="cart-float" onclick="checkout()">
+            <span>SAVATCHA (<span id="cart-count">0</span>)</span>
+            <span id="cart-total">0 so'm</span>
+        </div>
+    </div>
+
+    <div id="admin-panel" class="panel">
+        <h1 style="color: #f87171;">ADMIN PANEL</h1>
+        <div style="background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+            <h3>Kunlik natija</h3>
+            <h2 style="color: var(--success); margin: 0;">2,450,000 so'm</h2>
+            <p style="color: var(--secondary);">Bugun 34 ta buyurtma berildi</p>
+        </div>
+        <br>
+        <button class="btn-add" style="width: 100%;" onclick="tg.showAlert('Tez orada taom tahrirlash qo\'shiladi')">TAOM QO'SHISH</button>
+    </div>
+
+    <div id="courier-panel" class="panel">
+        <h1 style="color: var(--success);">KURYER PORTALI</h1>
+        <div style="background: var(--card); padding: 20px; border-radius: 20px; margin-bottom: 15px;">
+            <div class="flex-row">
+                <span class="badge">YANGI</span>
+                <b>#1025-Buyurtma</b>
+            </div>
+            <p>📍 Manzil: Yunusobod 4-kvartal</p>
+            <p>💰 To'lov: 77,000 (Naqd)</p>
+            <button class="btn-add" style="width: 100%; background: var(--success);" onclick="tg.showAlert('Mijozga xabar yuborildi!')">TOPShIRDIM ✅</button>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        const ADMIN_ID = 8448862547;
+        const COURIER_ID = 7312694067;
+        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 0;
+
+        let cart = [];
+
+        // Panellarni boshqarish
+        if (userId === ADMIN_ID) {
+            document.getElementById('admin-panel').style.display = 'block';
+        } else if (userId === COURIER_ID) {
+            document.getElementById('courier-panel').style.display = 'block';
+        } else {
+            document.getElementById('user-panel').style.display = 'block';
+        }
+
+        function addToCart(name, price) {
+            cart.push({name, price});
+            tg.HapticFeedback.impactOccurred('light');
+            updateCart();
+        }
+
+        function updateCart() {
+            const float = document.getElementById('cart-float');
+            const count = document.getElementById('cart-count');
+            const total = document.getElementById('cart-total');
+
+            if (cart.length > 0) {
+                float.style.display = 'flex';
+                count.innerText = cart.length;
+                const sum = cart.reduce((a, b) => a + b.price, 0);
+                total.innerText = sum.toLocaleString() + " so'm";
+            }
+        }
+
+        function checkout() {
+            const sum = cart.reduce((a, b) => a + b.price, 0);
+            tg.sendData(JSON.stringify({
+                action: 'order',
+                items: cart,
+                total: sum
+            }));
+        }
+    </script>
+</body>
+</html>
