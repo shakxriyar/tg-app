@@ -16,7 +16,8 @@
             --success: #10b981;
             --danger: #ef4444;
             --gradient: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -38,36 +39,35 @@
         /* ANIMATIONS */
         .panel { 
             display: none; 
-            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* HEADER */
-        header {
-            text-align: center;
-            padding: 20px 0;
-            margin-bottom: 10px;
-        }
-
+        /* HEADER ANIMATION */
         header h1 {
             font-size: 28px;
             letter-spacing: 4px;
             font-weight: 900;
             text-transform: uppercase;
+            text-align: center;
+            padding: 20px 0;
         }
 
-        header h1 span { color: var(--accent); }
+        header h1 span { 
+            color: var(--accent); 
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+        }
 
-        /* CATEGORIES SECTION */
+        /* CATEGORIES HOVER */
         .categories {
             display: flex;
             gap: 12px;
             overflow-x: auto;
-            padding: 10px 0 25px 0;
+            padding: 10px 5px 25px 5px;
             scrollbar-width: none;
         }
 
@@ -82,17 +82,23 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.3s all ease;
+            transition: var(--transition);
+        }
+
+        .cat:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            background: rgba(56, 189, 248, 0.05);
         }
 
         .cat.active {
             background: var(--accent);
             color: #000;
             border-color: var(--accent);
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+            box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
         }
 
-        /* FOOD CARDS */
+        /* FOOD CARDS HOVER ANIMATION */
         .food-card {
             background: var(--card);
             border-radius: 28px;
@@ -102,13 +108,27 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: var(--transition);
             box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
         }
 
-        .food-card:active { transform: scale(0.96); }
+        /* Hover effekti */
+        .food-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+        }
 
-        .food-emoji { font-size: 55px; }
+        .food-emoji { 
+            font-size: 55px; 
+            transition: var(--transition);
+        }
+
+        .food-card:hover .food-emoji {
+            transform: scale(1.1) rotate(10deg);
+        }
 
         .food-info { flex: 1; }
 
@@ -128,6 +148,7 @@
 
         .price { font-size: 18px; font-weight: 800; color: var(--accent); }
 
+        /* BUTTON HOVER */
         .btn-add {
             background: var(--gradient);
             color: #000;
@@ -136,15 +157,28 @@
             border-radius: 14px;
             font-weight: 800;
             cursor: pointer;
+            transition: var(--transition);
         }
 
-        /* INFO CARDS (Admin/Card details) */
+        .btn-add:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+        }
+
+        .btn-add:active { transform: scale(0.9); }
+
+        /* INFO CARDS HOVER */
         .info-card {
             background: var(--card);
             border-radius: 24px;
             padding: 20px;
             margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+        
+        .info-card:hover {
+            border-color: rgba(56, 189, 248, 0.2);
         }
 
         .label { color: var(--secondary); font-size: 13px; margin-bottom: 5px; display: block; }
@@ -159,10 +193,16 @@
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent);
+            color: #000;
         }
 
         .alert-box {
-            background: rgba(16, 185, 129, 0.1);
+            background: rgba(16, 185, 129, 0.05);
             border: 1px solid var(--success);
             padding: 15px;
             border-radius: 20px;
@@ -171,20 +211,13 @@
             font-size: 14px;
             line-height: 1.5;
             margin-bottom: 20px;
+            animation: pulse 2s infinite;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .stat-box {
-            background: rgba(255,255,255,0.03);
-            padding: 15px;
-            border-radius: 18px;
-            text-align: center;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
     </style>
 </head>
@@ -193,7 +226,7 @@
     <div id="user-panel" class="panel" style="display: block;">
         <header>
             <h1>SHOKH <span>FOOD</span></h1>
-            <p style="color: var(--secondary); font-size: 12px; letter-spacing: 1px;">PREMIUM QUALITY DELIVERY</p>
+            <p style="color: var(--secondary); font-size: 11px; text-align:center; letter-spacing: 2px;">PREMIUM QUALITY</p>
         </header>
 
         <div class="categories">
@@ -208,7 +241,7 @@
                 <div class="food-emoji">🍔</div>
                 <div class="food-info">
                     <h3>Burger Maxi</h3>
-                    <p>Go'shtli kotlet, cheddar pishlog'i va Shokh maxsus sousi.</p>
+                    <p>Premium mol go'shti, pishloq va maxsus Shokh sousi.</p>
                     <div class="price-row">
                         <span class="price">45,000 so'm</span>
                         <button class="btn-add" onclick="addToCart('Burger Maxi', 45000)">+</button>
@@ -220,7 +253,7 @@
                 <div class="food-emoji">🌯</div>
                 <div class="food-info">
                     <h3>Lavash Standart</h3>
-                    <p>Mol go'shti, chiplar, pomidor va maxsus ziravorlar.</p>
+                    <p>Issiq lavash, go'sht va yangi sabzavotlar.</p>
                     <div class="price-row">
                         <span class="price">32,000 so'm</span>
                         <button class="btn-add" onclick="addToCart('Lavash Standart', 32000)">+</button>
@@ -232,7 +265,7 @@
                 <div class="food-emoji">🥤</div>
                 <div class="food-info">
                     <h3>Coca-Cola 0.5L</h3>
-                    <p>Muzdek va tetiklashtiruvchi ichimlik.</p>
+                    <p>Muzdek tetiklik manbai.</p>
                     <div class="price-row">
                         <span class="price">12,000 so'm</span>
                         <button class="btn-add" onclick="addToCart('Coca-Cola 0.5L', 12000)">+</button>
@@ -243,12 +276,12 @@
     </div>
 
     <div id="payment-panel" class="panel">
-        <h2 style="text-align:center; margin-bottom:25px; color:var(--accent);">TO'LOV USULINI TANLANG</h2>
+        <h2 style="text-align:center; margin-bottom:25px; color:var(--accent);">TO'LOV USULI</h2>
         <div class="food-card" style="justify-content:center; text-align:center; cursor:pointer;" onclick="finishOrder('Naqd')">
             <div>
                 <span style="font-size:45px;">💵</span>
                 <h3 style="margin-top:10px;">Naqd pul orqali</h3>
-                <p style="color:var(--secondary); font-size:12px;">Kuryerga beriladi</p>
+                <p style="color:var(--secondary); font-size:12px;">Yetkazilganda to'lanadi</p>
             </div>
         </div>
         <div class="food-card" style="justify-content:center; text-align:center; cursor:pointer;" onclick="showCardDetails()">
@@ -258,64 +291,64 @@
                 <p style="color:var(--secondary); font-size:12px;">Onlayn o'tkazma</p>
             </div>
         </div>
-        <button class="btn-add" style="width:100%; background:var(--card); color:white; height:55px;" onclick="switchPanel('user-panel')">ORQAGA QAYTISH</button>
+        <button class="btn-add" style="width:100%; background:var(--card); color:white; height:55px;" onclick="switchPanel('user-panel')">MENYUGA QAYTISH</button>
     </div>
 
     <div id="card-details-panel" class="panel">
-        <h2 style="text-align:center; margin-bottom:20px; color:var(--accent);">TO'LOV MA'LUMOTLARI</h2>
+        <h2 style="text-align:center; margin-bottom:20px; color:var(--accent);">O'TKAZMA QILISH</h2>
         
         <div class="info-card">
-            <span class="label">To'lanadigan jami summa:</span>
+            <span class="label">Jami summa:</span>
             <span class="value" id="final-sum" style="color:var(--accent); font-size:24px;">0 so'm</span>
 
             <span class="label">Karta raqami:</span>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span class="value" id="card-number">8600 1234 5678 9012</span>
-                <button class="copy-btn" onclick="copyText('8600123456789012')">NUSXA OLISH</button>
+                <span class="value" style="letter-spacing:1px;">8600 0000 0000 0000</span>
+                <button class="copy-btn" onclick="copyText('8600000000000000')">NUSXA</button>
             </div>
 
             <span class="label">Karta egasi:</span>
             <span class="value">Shahriyor Allaberganov</span>
 
-            <span class="label">Admin bilan bog'lanish:</span>
+            <span class="label">Admin:</span>
             <span class="value">@shakhriyarr</span>
         </div>
 
         <div class="alert-box">
-            ⚠️ <b>MUHIM:</b> To'lovni amalga oshirgach, chekni va buyurtma raqamini adminga (<a href="https://t.me/shakhriyarr" style="color:var(--success); text-decoration:none;">@shakhriyarr</a>) yuboring!
+            ✅ To'lovdan so'ng chekni va buyurtma ID sini adminga yuboring!
         </div>
 
-        <button class="btn-add" style="width:100%; height:55px; margin-bottom:10px;" onclick="finishOrder('Karta (O\'tkazma kutilmoqda)')">BUYURTMANI TASDIQLASH</button>
+        <button class="btn-add" style="width:100%; height:55px; margin-bottom:10px;" onclick="finishOrder('Karta (Chek kutilmoqda)')">TASDIQLASH</button>
         <button class="btn-add" style="width:100%; background:var(--card); color:white; height:50px;" onclick="switchPanel('payment-panel')">ORQAGA</button>
     </div>
 
     <div id="admin-panel" class="panel">
-        <h2 style="text-align:center; margin-bottom:20px; color:var(--accent);">ADMIN PANELI</h2>
+        <h2 style="text-align:center; margin-bottom:20px; color:var(--accent);">ADMIN DASHBOARD</h2>
         <div class="info-card">
-            <h3>📊 Bugungi Statistika</h3>
-            <div class="stats-grid">
-                <div class="stat-box"><small>Tushum</small><br><b style="color:var(--success);">2.4 mln</b></div>
-                <div class="stat-box"><small>Buyurtmalar</small><br><b style="color:var(--accent);">42 ta</b></div>
+            <h3>📊 Bugungi hisobot</h3>
+            <div style="display: flex; gap:15px; margin-top:15px;">
+                <div style="flex:1; background:rgba(255,255,255,0.03); padding:15px; border-radius:15px; text-align:center;">
+                    <small>Tushum</small><br><b style="color:var(--success); font-size:20px;">2.4 mln</b>
+                </div>
+                <div style="flex:1; background:rgba(255,255,255,0.03); padding:15px; border-radius:15px; text-align:center;">
+                    <small>Sotuv</small><br><b style="color:var(--accent); font-size:20px;">42 ta</b>
+                </div>
             </div>
         </div>
-        <div class="info-card">
-            <h3>⚙️ Boshqaruv</h3>
-            <button class="btn-add" style="width: 100%; margin-top: 15px;">YANGI TAOM QO'SHISH</button>
-            <button class="btn-add" style="width: 100%; margin-top: 10px; background:var(--danger); color:white;">STOP LIST (O'CHIRISH)</button>
-        </div>
+        <button class="btn-add" style="width: 100%; margin-top: 10px;">+ TAOM QO'SHISH</button>
+        <button class="btn-add" style="width: 100%; margin-top: 10px; background:var(--danger); color:white;">STOP LIST</button>
     </div>
 
     <div id="courier-panel" class="panel">
-        <h2 style="text-align:center; margin-bottom:20px; color:var(--success);">KURYER PORTALI</h2>
+        <h2 style="text-align:center; margin-bottom:20px; color:var(--success);">KURYER PANELI</h2>
         <div class="info-card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                <b>Buyurtma #SH-9921</b>
-                <span style="color: var(--success); font-weight:bold;">YANGI</span>
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <b>ID: #8821</b>
+                <span style="color:var(--success);">YANGI</span>
             </div>
-            <p style="margin-bottom:10px;">📍 <b>Manzil:</b> Toshkent, Chilonzor 10</p>
-            <p style="margin-bottom:10px;">💰 <b>Summa:</b> 75,000 so'm (Karta)</p>
-            <hr style="opacity:0.1; margin: 15px 0;">
-            <button class="btn-add" style="width: 100%; background: var(--success); height:50px;" onclick="tg.showAlert('Mijozga yo\'lga chiqqaningiz haqida xabar yuborildi!')">BUYURTMANI QABUL QILISH ✅</button>
+            <p>📍 Manzil: Toshkent, Chilonzor 10</p>
+            <p>💰 Summa: 75,000 so'm</p>
+            <button class="btn-add" style="width: 100%; background: var(--success); margin-top:15px;" onclick="tg.showAlert('Yo\'lga chiqdingiz!')">QABUL QILISH</button>
         </div>
     </div>
 
@@ -323,51 +356,36 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         
-        // --- KONFIGURATSIYA ---
+        // ADMIN VA KURYER ID (O'zingiznikini qo'ying)
         const ADMIN_ID = 8448862547;
         const COURIER_ID = 7312694067; 
         const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 0;
 
         let cart = [];
 
-        // --- PANEL BOSHQARUVI ---
-        function switchPanel(panelId) {
+        function switchPanel(id) {
             document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
-            const target = document.getElementById(panelId);
-            if(target) target.style.display = 'block';
-            
-            if(panelId === 'user-panel') updateMainButton();
+            document.getElementById(id).style.display = 'block';
+            if(id === 'user-panel') updateMainButton();
             else tg.MainButton.hide();
         }
 
-        // Kirishda foydalanuvchini aniqlash
-        if (userId === ADMIN_ID) {
-            switchPanel('admin-panel');
-        } else if (userId === COURIER_ID) {
-            switchPanel('courier-panel');
-        } else {
-            switchPanel('user-panel');
-        }
+        // Kirishda panelni aniqlash
+        if (userId === ADMIN_ID) switchPanel('admin-panel');
+        else if (userId === COURIER_ID) switchPanel('courier-panel');
+        else switchPanel('user-panel');
 
-        // --- KATEGORIYA FILTRI ---
         function filterMenu(cat, el) {
             document.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
-            
-            const items = document.querySelectorAll('.food-card');
-            items.forEach(item => {
+            document.querySelectorAll('.food-card').forEach(item => {
                 if(item.dataset.category) {
-                    if(cat === 'all' || item.dataset.category === cat) {
-                        item.style.display = 'flex';
-                    } else {
-                        item.style.display = 'none';
-                    }
+                    item.style.display = (cat === 'all' || item.dataset.category === cat) ? 'flex' : 'none';
                 }
             });
             tg.HapticFeedback.impactOccurred('light');
         }
 
-        // --- SAVATCHA MANTIQLARI ---
         function addToCart(name, price) {
             cart.push({name, price});
             tg.HapticFeedback.notificationOccurred('success');
@@ -377,20 +395,13 @@
         function updateMainButton() {
             if (cart.length > 0) {
                 const total = cart.reduce((s, i) => s + i.price, 0);
-                tg.MainButton.setText(`TASDIQLASH (${total.toLocaleString()} so'm)`);
-                tg.MainButton.show();
+                tg.MainButton.setText(`BUYURTMA BERISH (${total.toLocaleString()} so'm)`).show();
                 tg.MainButton.setParams({ color: '#38bdf8', text_color: '#000000' });
-            } else {
-                tg.MainButton.hide();
-            }
+            } else { tg.MainButton.hide(); }
         }
 
-        // Telegram MainButton bosilganda to'lovga o'tish
-        tg.onEvent('mainButtonClicked', function() {
-            switchPanel('payment-panel');
-        });
+        tg.onEvent('mainButtonClicked', () => switchPanel('payment-panel'));
 
-        // --- TO'LOV TAFSILOTLARI ---
         function showCardDetails() {
             const total = cart.reduce((s, i) => s + i.price, 0);
             document.getElementById('final-sum').innerText = total.toLocaleString() + " so'm";
@@ -398,29 +409,14 @@
         }
 
         function copyText(text) {
-            const el = document.createElement('textarea');
-            el.value = text;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            tg.showAlert("Karta raqami nusxalandi! Endi to'lov qilishingiz mumkin.");
+            navigator.clipboard.writeText(text);
+            tg.showAlert("Karta raqami nusxalandi!");
         }
 
-        // --- YAKUNIY BUYURTMA YUBORISH ---
         function finishOrder(method) {
             const total = cart.reduce((s, i) => s + i.price, 0);
             const orderId = Math.floor(100000 + Math.random() * 900000); 
-            
-            const resultData = {
-                orderId: orderId,
-                items: cart,
-                total: total,
-                method: method
-            };
-            
-            // Botga yuborish
-            tg.sendData(JSON.stringify(resultData));
+            tg.sendData(JSON.stringify({orderId, items: cart, total, method}));
         }
     </script>
 </body>
