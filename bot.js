@@ -1,66 +1,59 @@
 const TelegramBot = require('node-telegram-bot-api');
 
-// MA'LUMOTLAR
-const token = '8664449888:AAFh_QEzGrqYLRbZESRWPG9Twwx60KmmgQk'; // BotFather'dan olingan token
+// KONFIGURATSIYA
+const token = '8664449888:AAFh_QEzGrqYLRbZESRWPG9Twwx60KmmgQk';
 const bot = new TelegramBot(token, {polling: true});
 
 const ADMIN_ID = 8448862547;
 const COURIER_ID = 7312694067;
 
-// START BUYRUG'I
+// START
 bot.onText(/\/start/, (msg) => {
-    const chatId = msg.chat.id;
-    bot.sendMessage(chatId, `Assalomu alaykum, ${msg.from.first_name}!\nShokh Food botiga xush kelibsiz!`, {
+    bot.sendMessage(msg.chat.id, `Xush kelibsiz Shahriyor! Shokh Food botiga marhamat.`, {
         reply_markup: {
             keyboard: [
-                [{ text: "🛒 Menyu / Buyurtma berish", web_app: { url: "YOUR_GITHUB_PAGES_URL" } }]
+                [{ text: "🛒 Menyu / Buyurtma", web_app: { url: "https://SizningGitHubManzilingiz.github.io/" } }]
             ],
             resize_keyboard: true
         }
     });
 });
 
-// WEB APP'DAN KELADIGAN MA'LUMOTLARNI TUTISH
+// WEB APP'DAN MA'LUMOT QABUL QILISH
 bot.on('web_app_data', async (msg) => {
-    const chatId = msg.chat.id;
-    const rawData = msg.web_app_data.data;
-    const data = JSON.parse(rawData);
+    try {
+        const data = JSON.parse(msg.web_app_data.data);
+        const chatId = msg.chat.id;
 
-    // 1. AGAR YANGI BUYURTMA BO'LSA
-    if (data.action === 'NEW_ORDER') {
-        let itemsString = data.items.map(i => `• ${i.name} - ${i.price.toLocaleString()} so'm`).join('\n');
-        
-        const report = `🔔 YANGI BUYURTMA!\n\n` +
-                       `👤 Mijoz: ${data.user.first_name} (@${data.user.username || 'yoq'})\n` +
-                       `🆔 ID: ${data.user.id}\n\n` +
-                       `📦 Taomlar:\n${itemsString}\n\n` +
-                       `💰 Jami summa: ${data.total.toLocaleString()} so'm\n` +
-                       `💳 To'lov turi: ${data.method}`;
+        // 1. YANGI BUYURTMA
+        if (data.type === 'NEW_ORDER') {
+            let list = data.items.map(i => `• ${i.name}`).join('\n');
+            
+            const adminText = `🔔 YANGI BUYURTMA!\n\n` +
+                `👤 Mijoz: ${data.user.first_name}\n` +
+                `📞 Tel: ${data.phone}\n` +
+                `📍 Manzil: ${data.address}\n\n` +
+                `🍱 Taomlar:\n${list}\n\n` +
+                `💰 Summa: ${data.total.toLocaleString()} so'm\n` +
+                `💳 To'lov: ${data.method}`;
 
-        // Mijozga xabar
-        await bot.sendMessage(chatId, `✅ Buyurtmangiz qabul qilindi!\nID: #${Math.floor(Math.random()*1000)}\n\nAdmin tez orada bog'lanadi.`);
+            // Adminga
+            await bot.sendMessage(ADMIN_ID, adminText);
+            // Kuryerga
+            await bot.sendMessage(COURIER_ID, adminText);
+            // Mijozga
+            await bot.sendMessage(chatId, `✅ Rahmat! Buyurtmangiz qabul qilindi.\n\nTez orada kuryer bog'lanadi.`);
+        }
 
-        // Adminga (Sizga) xabar
-        await bot.sendMessage(ADMIN_ID, report);
+        // 2. TAOM QO'SHISH (ADMIN)
+        if (data.type === 'ADD_FOOD') {
+            await bot.sendMessage(ADMIN_ID, `🍱 BAZAGA QO'SHILDI:\n\nNomi: ${data.name}\nNarxi: ${data.price} so'm`);
+        }
 
-        // Kuryerga xabar
-        await bot.sendMessage(COURIER_ID, report + `\n\n📍 Iltimos, mijoz bilan bog'lanib manzilni aniqlang!`);
-    }
-
-    // 2. AGAR ADMIN TAOM QO'SHSA
-    if (data.action === 'ADD_FOOD') {
-        const adminMsg = `🍱 YANGI TAOM QO'SHILDI:\n\n` +
-                         `Nomi: ${data.foodName}\n` +
-                         `Narxi: ${data.foodPrice} so'm\n` +
-                         `Kategoriya: ${data.foodCategory}`;
-        
-        await bot.sendMessage(ADMIN_ID, adminMsg);
+    } catch (e) {
+        console.log("Xatolik:", e);
+        bot.sendMessage(ADMIN_ID, "Web App'dan xato ma'lumot keldi.");
     }
 });
 
-// XATOLIKLARNI TEKSHIRISH
-bot.on('polling_error', (error) => {
-    console.error("Botda xatolik:", error);
-});
-
-console.log("Bot muvaffaqiyatli ishlamoqda...");
+console.log("Bot ishga tushdi...");
