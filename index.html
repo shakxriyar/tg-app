@@ -808,6 +808,9 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const menuRef = db.ref('menu');
+const ordersRef = db.ref('orders');
+const statsRef = db.ref('stats');
+const courierStatsRef = db.ref('courierStats');
 </script>
 
 <script>
@@ -827,14 +830,19 @@ let menu = [];
 let menuLoaded = false;
 
 let cart = [];
-let orders = {};
+let orders = {};       // Firebase dan real-time yuklanadi
 let orderCounter = 1;
 let stats = { totalSum: 0, items: {} };
 let courierStats = {};
-let currentUserId = "web_user_1";
+let currentUserId = localStorage.getItem('qopoq_userId');
+if (!currentUserId) {
+  currentUserId = "user_" + Math.random().toString(36).substr(2,10);
+  localStorage.setItem('qopoq_userId', currentUserId);
+}
 let currentRole = 'customer';
 let currentCourierId = null;
 let editingItemId = null;
+let ordersLoaded = false;
 
 // ============ UTILS ============
 function showToast(msg) {
@@ -1050,11 +1058,67 @@ function submitLocation() {
   showOrderStep();
 }
 
+// ============ TELEGRAM XABAR YUBORISH ============
+const TG_TOKEN = "8740580495:AAGLyL1oeM-Pu96tFzwvb5Y63uJaPWmGgEI";
+const TG_ADMIN = "8030496668";
+const TG_API = `https://api.telegram.org/bot${TG_TOKEN}`;
+
+async function sendOrderToTelegram(order, orderId) {
+  const payText = order.payType === 'karta' ? "💳 Karta (to'lov cheki kutilmoqda)" : "💵 Naqd pul";
+  const itemsList = order.items.map((i, idx) => `${idx + 1}. ${i.name} — ${i.price.toLocaleString()} so'm`).join('\n');
+  const locationLine = order.latitude
+    ? `📍 GPS lokatsiya yuborildi`
+    : `📍 Manzil: ${order.address || "Ko'rsatilmagan"}`;
+
+  const text =
+`🆕 *YANGI BUYURTMA #${orderId}*
+
+📋 *Tarkibi:*
+${itemsList}
+
+💰 *Jami: ${order.total.toLocaleString()} so'm*
+💳 *To'lov:* ${payText}
+
+📞 *Tel:* ${order.phone}
+${locationLine}
+🕐 *Vaqt:* ${order.timestamp}`;
+
+  try {
+    // Matn xabar
+    await fetch(`${TG_API}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TG_ADMIN,
+        text,
+        parse_mode: 'Markdown'
+      })
+    });
+
+    // GPS lokatsiya borsa — alohida yuborish
+    if (order.latitude && order.longitude) {
+      await fetch(`${TG_API}/sendLocation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TG_ADMIN,
+          latitude: order.latitude,
+          longitude: order.longitude
+        })
+      });
+    }
+  } catch (err) {
+    console.error('Telegram xabar yuborishda xatolik:', err);
+  }
+}
+
 function placeOrder(payType) {
   const total = cart.reduce((a, b) => a + b.price, 0);
-  const orderId = String(orderCounter++);
 
-  orders[orderId] = {
+  const newOrderRef = ordersRef.push();
+  const orderId = newOrderRef.key;
+
+  const orderData = {
     userId: currentUserId,
     phone: orderFlow.phone,
     address: orderFlow.address,
@@ -1067,19 +1131,26 @@ function placeOrder(payType) {
     statusClass: 'new',
     lockCancel: false,
     courierId: null,
-    timestamp: new Date().toLocaleTimeString('uz')
+    timestamp: new Date().toLocaleTimeString('uz'),
+    deliveredByCourier: false
   };
 
-  stats.items = stats.items || {};
+  // Firebase ga yozish
+  newOrderRef.set(orderData)
+    .then(() => {
+      // Adminga Telegram orqali xabar yuborish
+      sendOrderToTelegram(orderData, orderId);
+    })
+    .catch(err => console.error('Firebase order yozishda xatolik:', err));
+
   cart = [];
   updateFloatCart();
   renderMenu();
 
   if (payType === 'naqd') {
     closeModal('orderModal');
-    showToast(`✅ Buyurtma #${orderId} qabul qilindi!`);
+    showToast(`✅ Buyurtma qabul qilindi!`);
     showTab('orders');
-    renderMyOrders();
   } else {
     showCardPayInfo(orderId, total);
   }
@@ -1114,13 +1185,14 @@ function renderMyOrders() {
   el.innerHTML = myOrders.map(id => {
     const o = orders[id];
     const canCancel = !o.lockCancel;
+    const isDelivered = o.deliveredByCourier === true;
     return `
-      <div class="order-card status-${o.statusClass}">
-        <div class="order-id">📦 Buyurtma #${id} · ${o.timestamp}</div>
+      <div class="order-card status-${isDelivered ? 'done' : o.statusClass}">
+        <div class="order-id">📦 Buyurtma · ${o.timestamp}</div>
         <div class="order-items">${o.items.map(i => i.name).join(', ')}</div>
         <div class="order-total">${formatPrice(o.total)}</div>
-        <div class="order-status">${o.status}</div>
-        ${canCancel ? `<button class="btn btn-red" style="margin-top:10px;padding:8px;font-size:0.85rem" onclick="cancelMyOrder('${id}')">🚫 Bekor qilish</button>` : ''}
+        <div class="order-status">${isDelivered ? 'Yetkazib berildi ✅' : o.status}</div>
+        ${canCancel && !isDelivered ? `<button class="btn btn-red" style="margin-top:10px;padding:8px;font-size:0.85rem" onclick="cancelMyOrder('${id}')">🚫 Bekor qilish</button>` : ''}
       </div>
     `;
   }).join('');
@@ -1128,9 +1200,9 @@ function renderMyOrders() {
 
 function cancelMyOrder(id) {
   if (orders[id] && !orders[id].lockCancel) {
-    delete orders[id];
-    renderMyOrders();
-    showToast('Buyurtma bekor qilindi 🚫');
+    ordersRef.child(id).remove()
+      .then(() => showToast('Buyurtma bekor qilindi 🚫'))
+      .catch(() => showToast('Xatolik yuz berdi!'));
   } else {
     showToast('Bekor qilib bo\'lmaydi!');
   }
@@ -1211,7 +1283,9 @@ function deleteMenuItem(id) {
 
 function renderAdminOrders() {
   const el = document.getElementById('adminOrdersContent');
-  const all = Object.keys(orders);
+  // Admin panelda faqat hali kuryerga topshirilmagan yoki topshirilayotgan buyurtmalar ko'rinadi
+  // deliveredByCourier === true bo'lgan buyurtmalar admin panelda YASHIRILADI
+  const all = Object.keys(orders).filter(id => orders[id].deliveredByCourier !== true);
   if (!all.length) {
     el.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><p>Faol buyurtmalar yo'q</p></div>`;
     return;
@@ -1221,7 +1295,7 @@ function renderAdminOrders() {
     const payText = o.payType === 'karta' ? "💳 Karta" : "💵 Naqd pul";
     return `
       <div class="order-card status-${o.statusClass}" id="aorder-${id}">
-        <div class="order-id">🆕 Buyurtma #${id} · ${o.timestamp}</div>
+        <div class="order-id">🆕 Buyurtma · ${o.timestamp}</div>
         <div class="order-items">${o.items.map((i,idx)=>`${idx+1}. ${i.name}`).join('<br>')}</div>
         <div style="margin:6px 0;font-size:0.88rem;color:var(--muted)">📞 ${o.phone} | ${o.address || 'GPS lokatsiya'} | ${payText}</div>
         <div class="order-total">${formatPrice(o.total)}</div>
@@ -1240,27 +1314,27 @@ function renderAdminOrders() {
 
 function adminStartCooking(id) {
   if (orders[id]) {
-    orders[id].lockCancel = true;
-    orders[id].status = 'Tayyorlanmoqda 👨‍🍳';
-    orders[id].statusClass = 'cooking';
-    renderAdminOrders();
-    renderMyOrders();
-    showToast(`#${id} tayyorlanmoqda 👨‍🍳`);
+    ordersRef.child(id).update({
+      lockCancel: true,
+      status: 'Tayyorlanmoqda 👨‍🍳',
+      statusClass: 'cooking'
+    }).then(() => showToast(`#${id} tayyorlanmoqda 👨‍🍳`))
+      .catch(() => showToast('Xatolik!'));
   }
 }
 
 function adminAssignCourier(orderId, courierId) {
   if (orders[orderId]) {
-    orders[orderId].status = 'Kuryerga berildi 🚚';
-    orders[orderId].statusClass = 'courier';
-    orders[orderId].courierId = courierId;
-    if (!courierStats[courierId]) courierStats[courierId] = { assigned: 0, done: 0 };
-    courierStats[courierId].assigned++;
     const courier = COURIERS.find(c => c.id === courierId);
-    renderAdminOrders();
-    renderMyOrders();
-    renderCourierOrders();
-    showToast(`#${orderId} ${courier ? courier.name : 'kuryer'}ga yuborildi ✅`);
+    ordersRef.child(orderId).update({
+      status: 'Kuryerga berildi 🚚',
+      statusClass: 'courier',
+      courierId: courierId,
+      lockCancel: true,
+      deliveredByCourier: false
+    }).then(() => {
+      showToast(`#${orderId} ${courier ? courier.name : 'kuryer'}ga yuborildi ✅`);
+    }).catch(() => showToast('Xatolik!'));
   }
 }
 
@@ -1272,32 +1346,60 @@ function adminBusy(id) {
 
 function adminReject(id) {
   if (orders[id]) {
-    const o = orders[id];
-    o.status = 'Rad etildi ❌';
-    o.statusClass = 'cancelled';
-    setTimeout(() => { delete orders[id]; renderAdminOrders(); }, 3000);
-    renderAdminOrders();
-    renderMyOrders();
-    showToast(`#${id} rad etildi ❌`);
+    ordersRef.child(id).update({
+      status: 'Rad etildi ❌',
+      statusClass: 'cancelled'
+    }).then(() => {
+      setTimeout(() => {
+        ordersRef.child(id).remove();
+      }, 3000);
+      showToast(`#${id} rad etildi ❌`);
+    }).catch(() => showToast('Xatolik!'));
   }
 }
 
 function renderReport() {
   const el = document.getElementById('reportContent');
-  const activeCount = Object.keys(orders).length;
+
+  // Hamma buyurtmalardan (shu jumladan topshirilganlar) hisobot hisoblash
+  const allOrders = Object.values(orders);
+  const deliveredOrders = allOrders.filter(o => o.deliveredByCourier === true);
+  const activeOrders = allOrders.filter(o => o.deliveredByCourier !== true);
+
+  // Jami tushum — faqat topshirilgan buyurtmalardan
+  const totalSum = deliveredOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+
+  // Har bir taom necha marta buyurilgani
+  const itemCounts = {};
+  deliveredOrders.forEach(o => {
+    (o.items || []).forEach(i => {
+      itemCounts[i.name] = (itemCounts[i.name] || 0) + 1;
+    });
+  });
+
+  // Kuryer statistikasi — Firebase dagi barcha topshirilgan buyurtmalardan
+  const courierDoneCounts = {};
+  COURIERS.forEach(c => { courierDoneCounts[c.id] = 0; });
+  deliveredOrders.forEach(o => {
+    if (o.courierId && courierDoneCounts[o.courierId] !== undefined) {
+      courierDoneCounts[o.courierId]++;
+    }
+  });
+
   let itemsHtml = '';
-  for (let k in stats.items) {
-    itemsHtml += `<div class="contact-item"><span class="ci-icon">🔹</span> ${k}: <strong>${stats.items[k]} ta</strong></div>`;
+  for (let k in itemCounts) {
+    itemsHtml += `<div class="contact-item"><span class="ci-icon">🔹</span> ${k}: <strong>${itemCounts[k]} ta</strong></div>`;
   }
+
   el.innerHTML = `
     <div class="stat-box">
-      <div class="stat-num">${formatPrice(stats.totalSum)}</div>
+      <div class="stat-num">${formatPrice(totalSum)}</div>
       <div class="stat-label">💰 Jami tushum</div>
     </div>
     <div class="card">
       <div class="card-title">📊 Kunlik hisobot</div>
-      <div class="contact-item"><span class="ci-icon">📦</span> Faol buyurtmalar: <strong>${activeCount} ta</strong></div>
-      <div class="contact-item"><span class="ci-icon">✅</span> Yakunlangan: <strong>${stats.totalSum > 0 ? 'Bor' : '0 ta'}</strong></div>
+      <div class="contact-item"><span class="ci-icon">📦</span> Faol buyurtmalar: <strong>${activeOrders.length} ta</strong></div>
+      <div class="contact-item"><span class="ci-icon">✅</span> Yakunlangan: <strong>${deliveredOrders.length} ta</strong></div>
       ${itemsHtml || '<div class="text-muted" style="padding:12px">Hali ma\'lumot yo\'q</div>'}
     </div>
     <div class="card">
@@ -1305,7 +1407,7 @@ function renderReport() {
       ${COURIERS.map(c => `
         <div class="contact-item">
           <span class="ci-icon">👤</span>
-          ${c.name}: <strong>${(courierStats[c.id] && courierStats[c.id].done) || 0} ta topshirildi</strong>
+          ${c.name}: <strong>${courierDoneCounts[c.id] || 0} ta topshirildi</strong>
         </div>
       `).join('')}
     </div>
@@ -1316,10 +1418,17 @@ function renderReport() {
 function renderCourierOrders() {
   if (!currentCourierId) return;
   const el = document.getElementById('courierContent');
-  const myOrders = Object.keys(orders).filter(id => orders[id].courierId === currentCourierId);
+  // Faqat ushbu kuryerga biriktirilgan va hali topshirilmagan buyurtmalar
+  const myOrders = Object.keys(orders).filter(id =>
+    orders[id].courierId === currentCourierId &&
+    orders[id].deliveredByCourier !== true
+  );
 
-  document.getElementById('courierDoneCount').textContent =
-    (courierStats[currentCourierId] && courierStats[currentCourierId].done) || 0;
+  // Bugun ushbu kuryer tomonidan topshirilgan buyurtmalar soni Firebase dan hisoblanadi
+  const doneByCourier = Object.values(orders).filter(o =>
+    o.courierId === currentCourierId && o.deliveredByCourier === true
+  ).length;
+  document.getElementById('courierDoneCount').textContent = doneByCourier;
 
   if (!myOrders.length) {
     el.innerHTML = `<div class="empty"><div class="empty-icon">🚗</div><p>Hozircha buyurtma yo'q</p></div>`;
@@ -1330,7 +1439,7 @@ function renderCourierOrders() {
     const isOnWay = o.status.includes('Yo\'lda');
     return `
       <div class="order-card status-${o.statusClass}">
-        <div class="order-id">📦 Buyurtma #${id}</div>
+        <div class="order-id">📦 Buyurtma · ${o.timestamp}</div>
         <div class="order-items">${o.items.map((i,idx)=>`${idx+1}. ${i.name}`).join('<br>')}</div>
         <div style="margin:6px 0;font-size:0.88rem;color:var(--muted)">📞 ${o.phone} | ${o.address || 'GPS lokatsiya'}</div>
         <div class="order-total">${formatPrice(o.total)}</div>
@@ -1346,27 +1455,28 @@ function renderCourierOrders() {
 
 function courierTake(id) {
   if (orders[id]) {
-    orders[id].status = "Yo'lda 🚚";
-    orders[id].statusClass = 'courier';
-    renderCourierOrders();
-    renderMyOrders();
-    showToast('Mijozga xabar yuborildi! ✅');
+    ordersRef.child(id).update({
+      status: "Yo'lda 🚚",
+      statusClass: 'courier'
+    }).then(() => showToast('Mijozga xabar yuborildi! ✅'))
+      .catch(() => showToast('Xatolik!'));
   }
 }
 
 function courierDone(id) {
   if (orders[id]) {
-    const o = orders[id];
-    stats.totalSum += o.total;
-    o.items.forEach(i => {
-      stats.items[i.name] = (stats.items[i.name] || 0) + 1;
-    });
-    if (!courierStats[currentCourierId]) courierStats[currentCourierId] = { assigned: 0, done: 0 };
-    courierStats[currentCourierId].done++;
-    delete orders[id];
-    renderCourierOrders();
-    renderMyOrders();
-    showToast('🏁 Buyurtma yakunlandi!');
+    // deliveredByCourier = true qo'yamiz — hisobot shu belgidan hisoblanadi
+    ordersRef.child(id).update({
+      deliveredByCourier: true,
+      status: 'Yetkazib berildi ✅',
+      statusClass: 'done'
+    }).then(() => {
+      // Kuryer panelida "topshirilgan" sonini yangilaymiz (faqat joriy sessiya uchun)
+      if (!courierStats[currentCourierId]) courierStats[currentCourierId] = { done: 0 };
+      courierStats[currentCourierId].done++;
+      renderCourierOrders();
+      showToast('🏁 Buyurtma yakunlandi!');
+    }).catch(() => showToast('Xatolik!'));
   }
 }
 
@@ -1513,8 +1623,19 @@ function loginCourier(id, name) {
   showToast(`${name} — Kuryer paneli! 🚗`);
 }
 
-// ============ FIREBASE REAL-TIME LISTENER ============
-// Menyu o'zgarishlarini real vaqtda eshitish
+// ============ FIREBASE REAL-TIME LISTENER — BUYURTMALAR ============
+ordersRef.on('value', (snapshot) => {
+  const data = snapshot.val();
+  orders = data ? data : {};
+  ordersLoaded = true;
+
+  // Barcha panellarni yangilash
+  if (currentRole === 'admin') renderAdminOrders();
+  if (currentRole === 'courier') renderCourierOrders();
+  if (currentTab === 'orders') renderMyOrders();
+});
+
+// ============ FIREBASE REAL-TIME LISTENER — MENYU ============
 menuRef.on('value', (snapshot) => {
   const data = snapshot.val();
   if (data) {
