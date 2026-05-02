@@ -815,7 +815,7 @@ const courierStatsRef = db.ref('courierStats');
 
 <script>
 // ============ DATA ============
-const ADMIN_ID = "w777";
+const ADMIN_ID = "8030496668";
 const ADMIN_USERNAME = "@shaxriiyar";
 const KARTA_RAQAM = "8600 0000 0000 0000";
 const KARTA_EGASI = "Falonchi Pistonchiyev";
@@ -1063,6 +1063,12 @@ const TG_TOKEN = "8740580495:AAGLyL1oeM-Pu96tFzwvb5Y63uJaPWmGgEI";
 const TG_ADMIN = "8030496668";
 const TG_API = `https://api.telegram.org/bot${TG_TOKEN}`;
 
+// Kuryer Telegram ID lari
+const COURIER_TG_IDS = {
+  "7312694067": "6457425447",  // Shahriyor
+  "222222222":  null           // Ali — hozircha yo'q
+};
+
 async function sendOrderToTelegram(order, orderId) {
   const payText = order.payType === 'karta' ? "💳 Karta (to'lov cheki kutilmoqda)" : "💵 Naqd pul";
   const itemsList = order.items.map((i, idx) => `${idx + 1}. ${i.name} — ${i.price.toLocaleString()} so'm`).join('\n');
@@ -1084,7 +1090,6 @@ ${locationLine}
 🕐 *Vaqt:* ${order.timestamp}`;
 
   try {
-    // Matn xabar
     await fetch(`${TG_API}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1095,7 +1100,6 @@ ${locationLine}
       })
     });
 
-    // GPS lokatsiya borsa — alohida yuborish
     if (order.latitude && order.longitude) {
       await fetch(`${TG_API}/sendLocation`, {
         method: 'POST',
@@ -1109,6 +1113,51 @@ ${locationLine}
     }
   } catch (err) {
     console.error('Telegram xabar yuborishda xatolik:', err);
+  }
+}
+
+async function sendOrderToCourier(order, orderId, courierTgId, courierName) {
+  const payText = order.payType === 'karta' ? "💳 Karta" : "💵 Naqd pul";
+  const itemsList = order.items.map((i, idx) => `${idx + 1}. ${i.name} — ${i.price.toLocaleString()} so'm`).join('\n');
+
+  const text =
+`🚚 *YANGI BUYURTMA — ${courierName}*
+
+📋 *Tarkibi:*
+${itemsList}
+
+💰 *Jami: ${order.total.toLocaleString()} so'm*
+💳 *To'lov:* ${payText}
+
+📞 *Mijoz tel:* ${order.phone}
+📍 *Manzil:* ${order.address || "GPS (quyida)"}
+🕐 *Vaqt:* ${order.timestamp}`;
+
+  try {
+    await fetch(`${TG_API}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: courierTgId,
+        text,
+        parse_mode: 'Markdown'
+      })
+    });
+
+    // GPS lokatsiya borsa kuryerga ham yuboramiz
+    if (order.latitude && order.longitude) {
+      await fetch(`${TG_API}/sendLocation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: courierTgId,
+          latitude: order.latitude,
+          longitude: order.longitude
+        })
+      });
+    }
+  } catch (err) {
+    console.error('Kuryerga Telegram xabar yuborishda xatolik:', err);
   }
 }
 
@@ -1326,6 +1375,7 @@ function adminStartCooking(id) {
 function adminAssignCourier(orderId, courierId) {
   if (orders[orderId]) {
     const courier = COURIERS.find(c => c.id === courierId);
+    const courierTgId = COURIER_TG_IDS[courierId];
     ordersRef.child(orderId).update({
       status: 'Kuryerga berildi 🚚',
       statusClass: 'courier',
@@ -1334,6 +1384,10 @@ function adminAssignCourier(orderId, courierId) {
       deliveredByCourier: false
     }).then(() => {
       showToast(`#${orderId} ${courier ? courier.name : 'kuryer'}ga yuborildi ✅`);
+      // Kuryerga Telegram xabar yuborish
+      if (courierTgId) {
+        sendOrderToCourier(orders[orderId], orderId, courierTgId, courier ? courier.name : 'Kuryer');
+      }
     }).catch(() => showToast('Xatolik!'));
   }
 }
