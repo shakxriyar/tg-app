@@ -617,12 +617,8 @@
 <!-- HEADER -->
 <header class="header">
   <div class="header-inner">
-    <div class="logo">Qopoq <span>Somsa</span> 🥙</div>
-    <div class="header-btns">
-      <button class="role-btn active" onclick="setRole('customer')">👤 Mijoz</button>
-      <button class="role-btn" onclick="openLogin('admin')">🛠 Admin</button>
-      <button class="role-btn" onclick="openLogin('courier')">🚗 Kuryer</button>
-    </div>
+    <div class="logo" id="secretLogo" onclick="secretTap()" style="cursor:default;user-select:none">Qopoq <span>Somsa</span> 🥙</div>
+    <div id="secretHint" style="font-size:0.72rem;color:rgba(255,255,255,0.5);font-weight:700;letter-spacing:0.5px;transition:opacity 0.3s;opacity:0"></div>
   </div>
 </header>
 
@@ -693,6 +689,10 @@
 <!-- ========== ADMIN PANEL ========== -->
 <div class="panel" id="panel-admin">
   <div class="container">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--primary-dark)">🛠 Admin panel</div>
+      <button onclick="setRole('customer')" style="background:var(--border);border:none;border-radius:20px;padding:7px 16px;font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:var(--muted)">🏠 Chiqish</button>
+    </div>
 
     <div class="admin-nav">
       <button class="admin-nav-btn active" onclick="showAdminSection('menu')" id="anav-menu">
@@ -744,8 +744,11 @@
 <!-- ========== COURIER PANEL ========== -->
 <div class="panel" id="panel-courier">
   <div class="container">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="card-title" id="courierPanelTitle" style="margin-bottom:0">🚗 Kuryer paneli</div>
+      <button onclick="setRole('customer')" style="background:var(--border);border:none;border-radius:20px;padding:7px 16px;font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:var(--muted)">🏠 Chiqish</button>
+    </div>
     <div class="card">
-      <div class="card-title" id="courierPanelTitle">🚗 Kuryer paneli</div>
       <div id="courierContent"></div>
     </div>
     <div class="stat-box">
@@ -1375,50 +1378,99 @@ function setRole(role) {
   });
   document.getElementById(`panel-${role}`).classList.add('active');
 
-  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
   if (role === 'customer') {
-    document.querySelectorAll('.role-btn')[0].classList.add('active');
     document.getElementById('floatCart').style.display = cart.length > 0 ? 'flex' : 'none';
     renderMenu();
   } else {
     document.getElementById('floatCart').style.display = 'none';
-    if (role === 'admin') {
-      document.querySelectorAll('.role-btn')[1].classList.add('active');
-      renderAdminMenu();
-    }
-    if (role === 'courier') {
-      document.querySelectorAll('.role-btn')[2].classList.add('active');
-      renderCourierOrders();
-    }
+    if (role === 'admin') renderAdminMenu();
+    if (role === 'courier') renderCourierOrders();
+  }
+}
+
+// ============ SECRET TAP (5 marta logo bosish) ============
+const COURIER_PINS = {
+  "7312694067": "1111",  // Shahriyor
+  "222222222":  "2222"   // Ali
+};
+let tapCount = 0;
+let tapTimer = null;
+
+function secretTap() {
+  tapCount++;
+  const hint = document.getElementById('secretHint');
+  const remaining = 5 - tapCount;
+
+  if (tapCount === 1) {
+    hint.style.opacity = '1';
+    tapTimer = setTimeout(() => {
+      tapCount = 0;
+      hint.style.opacity = '0';
+    }, 3000);
+  }
+
+  if (tapCount >= 2 && tapCount < 5) {
+    hint.textContent = `🔐 ${remaining} ta qoldi...`;
+  }
+
+  if (tapCount >= 5) {
+    clearTimeout(tapTimer);
+    tapCount = 0;
+    hint.style.opacity = '0';
+    hint.textContent = '';
+    openLogin('secret');
   }
 }
 
 function openLogin(role) {
   const el = document.getElementById('loginModalContent');
-  if (role === 'admin') {
+  if (role === 'secret' || role === 'admin') {
     el.innerHTML = `
       <div style="text-align:center">
-        <div style="font-size:3rem;margin-bottom:8px">🛠</div>
-        <div class="modal-title">Admin panel</div>
+        <div style="font-size:3rem;margin-bottom:8px">🔐</div>
+        <div class="modal-title">Maxfiy kirish</div>
       </div>
-      <div class="form-group">
-        <label>Admin ID</label>
-        <input type="password" id="adminPassInput" placeholder="Admin ID kiriting">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <button class="btn btn-primary" style="margin-top:0" onclick="showLoginForm('admin')">🛠 Admin</button>
+        <button class="btn btn-outline" style="margin-top:0" onclick="showLoginForm('courier')">🚗 Kuryer</button>
       </div>
-      <button class="btn btn-primary" onclick="loginAdmin()">Kirish</button>
-    `;
-  } else {
-    el.innerHTML = `
-      <div style="text-align:center">
-        <div style="font-size:3rem;margin-bottom:8px">🚗</div>
-        <div class="modal-title">Kuryer paneli</div>
-      </div>
-      <p style="text-align:center;color:var(--muted);font-size:0.9rem;margin-bottom:16px">Kuryer sifatida kiring:</p>
-      <button class="btn btn-primary" onclick="loginCourier('7312694067','Shahriyor')">🚗 Shahriyor</button>
-      <button class="btn btn-outline" onclick="loginCourier('222222222','Ali')">🚗 Ali</button>
+      <div id="loginFormArea"></div>
     `;
   }
   openModal('loginModal');
+}
+
+function showLoginForm(type) {
+  const el = document.getElementById('loginFormArea');
+  if (type === 'admin') {
+    el.innerHTML = `
+      <div class="form-group" style="margin-top:8px">
+        <label>Admin paroli</label>
+        <input type="password" id="adminPassInput" placeholder="••••••••••" style="text-align:center;letter-spacing:4px;font-size:1.1rem">
+      </div>
+      <button class="btn btn-primary" onclick="loginAdmin()">✅ Kirish</button>
+    `;
+    setTimeout(() => document.getElementById('adminPassInput')?.focus(), 100);
+  } else {
+    el.innerHTML = `
+      <div style="margin-top:8px">
+        <div class="form-group">
+          <label>Kuryer tanlang</label>
+          <select id="courierSelect" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;font-family:Nunito,sans-serif;font-size:0.95rem;background:var(--bg)">
+            <option value="">— Tanlang —</option>
+            <option value="7312694067">🚗 Shahriyor</option>
+            <option value="222222222">🚗 Ali</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Kuryer PIN kodi</label>
+          <input type="password" id="courierPinInput" placeholder="••••" maxlength="4" style="text-align:center;letter-spacing:8px;font-size:1.3rem">
+        </div>
+        <button class="btn btn-primary" onclick="loginCourierWithPin()">✅ Kirish</button>
+      </div>
+    `;
+    setTimeout(() => document.getElementById('courierSelect')?.focus(), 100);
+  }
 }
 
 function loginAdmin() {
@@ -1428,8 +1480,29 @@ function loginAdmin() {
     setRole('admin');
     showToast('Admin panel! 🛠');
   } else {
-    showToast('Noto\'g\'ri ID!');
+    showToast('❌ Noto\'g\'ri parol!');
+    document.getElementById('adminPassInput').value = '';
+    document.getElementById('adminPassInput').focus();
   }
+}
+
+function loginCourierWithPin() {
+  const id = document.getElementById('courierSelect').value;
+  const pin = document.getElementById('courierPinInput').value.trim();
+  if (!id) { showToast('Kuryerni tanlang!'); return; }
+  if (!pin) { showToast('PIN kiriting!'); return; }
+  if (pin !== COURIER_PINS[id]) {
+    showToast('❌ Noto\'g\'ri PIN!');
+    document.getElementById('courierPinInput').value = '';
+    document.getElementById('courierPinInput').focus();
+    return;
+  }
+  const name = id === '7312694067' ? 'Shahriyor' : 'Ali';
+  currentCourierId = id;
+  closeModal('loginModal');
+  document.getElementById('courierPanelTitle').textContent = `🚗 ${name} — Kuryer paneli`;
+  setRole('courier');
+  showToast(`${name} — Kuryer paneli! 🚗`);
 }
 
 function loginCourier(id, name) {
