@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Qopoq Somsa 🥙</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -21,16 +21,20 @@
     --blue: #3498DB;
     --shadow: 0 4px 24px rgba(232,67,10,0.10);
     --shadow-lg: 0 8px 40px rgba(232,67,10,0.18);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-  body {
+  html, body {
     font-family: 'Nunito', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    min-height: -webkit-fill-available;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* HEADER */
@@ -41,6 +45,7 @@
     top: 0;
     z-index: 100;
     box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+    padding-top: var(--safe-top);
   }
   .header-inner {
     max-width: 700px;
@@ -48,37 +53,34 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
+    padding: 14px 16px;
   }
   .logo {
     font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 900;
     color: #fff;
     letter-spacing: -0.5px;
+    user-select: none;
+    -webkit-user-select: none;
   }
   .logo span { color: var(--accent); }
-  .header-btns { display: flex; gap: 8px; }
-  .role-btn {
-    background: rgba(255,255,255,0.15);
-    color: #fff;
-    border: 1.5px solid rgba(255,255,255,0.3);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 0.78rem;
+  #secretHint {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.6);
     font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'Nunito', sans-serif;
-  }
-  .role-btn:hover, .role-btn.active {
-    background: var(--accent);
-    color: var(--primary-dark);
-    border-color: var(--accent);
+    letter-spacing: 0.5px;
+    transition: opacity 0.3s;
+    opacity: 0;
   }
 
   /* CONTAINER */
-  .container { max-width: 700px; margin: 0 auto; padding: 24px 16px; }
+  .container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 16px 14px;
+    padding-bottom: calc(80px + var(--safe-bottom));
+  }
 
   /* PANEL */
   .panel { display: none; }
@@ -88,11 +90,11 @@
   .nav-tabs {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-bottom: 24px;
+    gap: 6px;
+    margin-bottom: 16px;
     background: var(--card);
     border-radius: 16px;
-    padding: 8px;
+    padding: 6px;
     box-shadow: var(--shadow);
   }
   .tab-btn {
@@ -102,16 +104,18 @@
     padding: 10px 4px;
     cursor: pointer;
     font-family: 'Nunito', sans-serif;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 700;
     color: var(--muted);
     transition: all 0.2s;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
+    min-height: 52px;
+    justify-content: center;
   }
-  .tab-btn .icon { font-size: 1.3rem; }
+  .tab-btn .icon { font-size: 1.25rem; }
   .tab-btn:hover, .tab-btn.active {
     background: var(--primary);
     color: #fff;
@@ -121,15 +125,15 @@
   .card {
     background: var(--card);
     border-radius: 18px;
-    padding: 20px;
+    padding: 16px;
     box-shadow: var(--shadow);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .card-title {
     font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     color: var(--primary-dark);
   }
 
@@ -137,46 +141,50 @@
   .menu-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    gap: 12px;
   }
   .menu-item {
     background: var(--card);
     border: 2px solid var(--border);
-    border-radius: 18px;
-    padding: 18px 14px;
+    border-radius: 16px;
+    padding: 14px 10px;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
   }
-  .menu-item:hover {
+  .menu-item:active {
+    transform: scale(0.97);
+  }
+  .menu-item.selected {
     border-color: var(--primary);
-    transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
   }
-  .menu-item .food-emoji { font-size: 2.5rem; display: block; margin-bottom: 8px; }
-  .menu-item .food-name { font-weight: 800; font-size: 0.95rem; margin-bottom: 6px; line-height: 1.3; }
+  .menu-item .food-emoji { font-size: 2.3rem; display: block; margin-bottom: 6px; }
+  .menu-item .food-name { font-weight: 800; font-size: 0.9rem; margin-bottom: 5px; line-height: 1.3; }
   .menu-item .food-price {
     color: var(--primary);
     font-weight: 800;
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
   .menu-item .add-btn {
-    margin-top: 10px;
+    margin-top: 8px;
     background: var(--primary);
     color: #fff;
     border: none;
     border-radius: 20px;
-    padding: 7px 18px;
-    font-size: 0.8rem;
+    padding: 8px 16px;
+    font-size: 0.82rem;
     font-weight: 700;
     cursor: pointer;
     font-family: 'Nunito', sans-serif;
     transition: background 0.2s;
     width: 100%;
+    min-height: 36px;
   }
-  .menu-item .add-btn:hover { background: var(--primary-dark); }
+  .menu-item .add-btn:active { background: var(--primary-dark); }
   .menu-item .badge {
     position: absolute;
     top: 8px;
@@ -200,29 +208,36 @@
     justify-content: space-between;
     padding: 12px 0;
     border-bottom: 1px solid var(--border);
+    gap: 8px;
   }
   .cart-item:last-child { border-bottom: none; }
-  .cart-item-name { font-weight: 700; flex: 1; }
-  .cart-item-price { color: var(--primary); font-weight: 800; margin: 0 12px; }
+  .cart-item-name { font-weight: 700; flex: 1; font-size: 0.92rem; }
+  .cart-item-price { color: var(--primary); font-weight: 800; white-space: nowrap; font-size: 0.88rem; }
   .cart-item-del {
-    background: none;
+    background: #FDEDEC;
     border: none;
-    font-size: 1.1rem;
+    border-radius: 8px;
+    font-size: 1rem;
     cursor: pointer;
     color: var(--red);
-    padding: 4px;
+    padding: 6px 8px;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .cart-total {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 0 0;
-    font-size: 1.1rem;
+    padding: 14px 0 0;
+    font-size: 1.05rem;
     font-weight: 800;
     border-top: 2px solid var(--border);
     margin-top: 8px;
   }
-  .cart-total span { color: var(--primary); font-size: 1.3rem; }
+  .cart-total span { color: var(--primary); font-size: 1.2rem; }
 
   /* BUTTONS */
   .btn {
@@ -235,14 +250,14 @@
     font-size: 1rem;
     font-weight: 800;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
     text-align: center;
     margin-top: 10px;
+    min-height: 48px;
   }
+  .btn:active { transform: scale(0.98); opacity: 0.9; }
   .btn-primary { background: var(--primary); color: #fff; }
-  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
   .btn-secondary { background: var(--border); color: var(--text); }
-  .btn-secondary:hover { background: #e5c9b8; }
   .btn-green { background: var(--green); color: #fff; }
   .btn-red { background: var(--red); color: #fff; }
   .btn-outline {
@@ -250,29 +265,29 @@
     border: 2px solid var(--primary);
     color: var(--primary);
   }
-  .btn-outline:hover { background: var(--primary); color: #fff; }
   .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
 
   /* FORM */
-  .form-group { margin-bottom: 16px; }
+  .form-group { margin-bottom: 14px; }
   .form-group label {
     display: block;
     font-weight: 700;
     margin-bottom: 6px;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     color: var(--muted);
   }
   .form-group input, .form-group select {
     width: 100%;
-    padding: 12px 16px;
+    padding: 13px 16px;
     border: 2px solid var(--border);
     border-radius: 12px;
     font-family: 'Nunito', sans-serif;
-    font-size: 0.95rem;
+    font-size: 16px; /* iOS zoom oldini olish uchun min 16px */
     outline: none;
     transition: border-color 0.2s;
     background: var(--bg);
     color: var(--text);
+    min-height: 48px;
   }
   .form-group input:focus, .form-group select:focus {
     border-color: var(--primary);
@@ -283,26 +298,27 @@
   .pay-card-box {
     background: linear-gradient(135deg, #1a1a2e, #16213e);
     border-radius: 18px;
-    padding: 24px;
+    padding: 20px;
     color: #fff;
-    margin: 16px 0;
+    margin: 14px 0;
   }
   .pay-card-box .card-number {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     letter-spacing: 3px;
     font-weight: 800;
-    margin: 12px 0 8px;
+    margin: 10px 0 6px;
     color: var(--accent);
+    word-break: break-all;
   }
-  .pay-card-box .card-owner { opacity: 0.7; font-size: 0.9rem; margin-bottom: 12px; }
-  .pay-card-box .card-amount { font-size: 1.5rem; font-weight: 900; color: #4ade80; }
+  .pay-card-box .card-owner { opacity: 0.7; font-size: 0.88rem; margin-bottom: 10px; }
+  .pay-card-box .card-amount { font-size: 1.4rem; font-weight: 900; color: #4ade80; }
 
   /* ORDER CARD */
   .order-card {
     background: var(--card);
     border-radius: 16px;
     border-left: 5px solid var(--primary);
-    padding: 16px;
+    padding: 14px;
     margin-bottom: 12px;
     box-shadow: var(--shadow);
   }
@@ -312,16 +328,16 @@
   .order-card.status-done { border-left-color: var(--green); }
   .order-card.status-cancelled { border-left-color: var(--red); }
   .order-id {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--muted);
     font-weight: 700;
     margin-bottom: 4px;
   }
-  .order-items { font-weight: 700; margin-bottom: 6px; line-height: 1.5; }
-  .order-total { color: var(--primary); font-weight: 800; font-size: 1.05rem; }
+  .order-items { font-weight: 700; margin-bottom: 6px; line-height: 1.5; font-size: 0.92rem; }
+  .order-total { color: var(--primary); font-weight: 800; font-size: 1rem; }
   .order-status {
     display: inline-block;
-    padding: 3px 10px;
+    padding: 4px 12px;
     border-radius: 20px;
     font-size: 0.78rem;
     font-weight: 700;
@@ -340,29 +356,35 @@
     justify-content: space-between;
     padding: 12px 0;
     border-bottom: 1px solid var(--border);
+    gap: 8px;
   }
   .admin-item:last-child { border-bottom: none; }
-  .admin-item-info { flex: 1; }
-  .admin-item-name { font-weight: 700; }
-  .admin-item-price { color: var(--primary); font-weight: 800; font-size: 0.95rem; }
-  .admin-item-btns { display: flex; gap: 8px; }
+  .admin-item-info { flex: 1; min-width: 0; }
+  .admin-item-name { font-weight: 700; font-size: 0.92rem; }
+  .admin-item-price { color: var(--primary); font-weight: 800; font-size: 0.9rem; }
+  .admin-item-btns { display: flex; gap: 6px; flex-shrink: 0; }
   .icon-btn {
-    background: none;
+    background: var(--bg);
     border: 1.5px solid var(--border);
     border-radius: 10px;
-    padding: 6px 10px;
+    padding: 8px 10px;
     cursor: pointer;
     font-size: 1rem;
     transition: all 0.2s;
+    min-width: 38px;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .icon-btn:hover { border-color: var(--primary); }
+  .icon-btn:active { border-color: var(--primary); background: #FFF0E8; }
 
   /* MODAL */
   .modal-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.55);
     z-index: 200;
     justify-content: center;
     align-items: flex-end;
@@ -372,10 +394,14 @@
   .modal {
     background: var(--card);
     border-radius: 24px 24px 0 0;
-    padding: 28px 24px 36px;
+    padding: 28px 20px;
+    padding-bottom: calc(24px + var(--safe-bottom));
     width: 100%;
     max-width: 700px;
     animation: slideUp 0.3s ease;
+    max-height: 92vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   @keyframes slideUp {
     from { transform: translateY(100%); opacity: 0; }
@@ -383,94 +409,86 @@
   }
   .modal-title {
     font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     text-align: center;
+    color: var(--primary-dark);
   }
   .modal-close {
     position: absolute;
-    top: 16px;
-    right: 20px;
-    background: none;
+    top: 14px;
+    right: 16px;
+    background: var(--bg);
     border: none;
-    font-size: 1.5rem;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 1.2rem;
     cursor: pointer;
     color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* TOAST */
   .toast {
     position: fixed;
-    bottom: 30px;
+    bottom: calc(24px + var(--safe-bottom));
     left: 50%;
     transform: translateX(-50%) translateY(100px);
     background: #1A0A00;
     color: #fff;
-    padding: 12px 24px;
+    padding: 12px 22px;
     border-radius: 40px;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     z-index: 999;
     transition: transform 0.3s ease;
     white-space: nowrap;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-
-  /* ADMIN/COURIER LOGIN */
-  .login-box {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 32px 24px;
-    max-width: 380px;
-    margin: 40px auto;
-    box-shadow: var(--shadow-lg);
+    max-width: calc(100vw - 40px);
     text-align: center;
   }
-  .login-box .login-icon { font-size: 3rem; margin-bottom: 12px; }
-  .login-box h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    color: var(--primary-dark);
-  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
 
   /* STAT BOX */
   .stat-box {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     border-radius: 18px;
-    padding: 20px;
+    padding: 18px;
     color: #fff;
     text-align: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .stat-box .stat-num {
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 900;
     font-family: 'Playfair Display', serif;
   }
-  .stat-box .stat-label { opacity: 0.85; font-size: 0.9rem; font-weight: 700; }
+  .stat-box .stat-label { opacity: 0.85; font-size: 0.88rem; font-weight: 700; }
 
   /* CONTACT */
   .contact-item {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px;
+    gap: 12px;
+    padding: 12px;
     background: var(--bg);
-    border-radius: 14px;
-    margin-bottom: 10px;
+    border-radius: 12px;
+    margin-bottom: 8px;
     font-weight: 700;
+    font-size: 0.9rem;
   }
-  .contact-item .ci-icon { font-size: 1.5rem; }
+  .contact-item .ci-icon { font-size: 1.4rem; flex-shrink: 0; }
 
   /* EMPTY STATE */
   .empty {
     text-align: center;
-    padding: 40px 20px;
+    padding: 36px 20px;
     color: var(--muted);
   }
-  .empty .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+  .empty .empty-icon { font-size: 2.8rem; margin-bottom: 10px; }
   .empty p { font-weight: 700; }
 
   /* STEP INDICATOR */
@@ -478,43 +496,29 @@
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
   .step {
-    width: 30px;
-    height: 6px;
+    width: 28px;
+    height: 5px;
     border-radius: 4px;
     background: var(--border);
     transition: background 0.3s;
   }
   .step.active { background: var(--primary); }
 
-  /* COURIER BADGE */
-  .courier-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    background: #EBF5FB;
-    color: var(--blue);
-    margin-top: 6px;
-  }
-
   /* ADMIN NAV */
   .admin-nav {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 16px;
   }
   .admin-nav-btn {
     background: var(--card);
     border: 2px solid var(--border);
     border-radius: 14px;
-    padding: 14px 8px;
+    padding: 12px 8px;
     cursor: pointer;
     font-family: 'Nunito', sans-serif;
     font-size: 0.75rem;
@@ -524,11 +528,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     box-shadow: var(--shadow);
+    min-height: 58px;
+    justify-content: center;
   }
-  .admin-nav-btn .icon { font-size: 1.4rem; }
-  .admin-nav-btn:hover, .admin-nav-btn.active {
+  .admin-nav-btn .icon { font-size: 1.3rem; }
+  .admin-nav-btn.active {
     border-color: var(--primary);
     background: var(--primary);
     color: #fff;
@@ -541,8 +547,8 @@
   /* FLOATING CART */
   .float-cart {
     position: fixed;
-    bottom: 24px;
-    right: 20px;
+    bottom: calc(20px + var(--safe-bottom));
+    right: 16px;
     background: var(--primary);
     color: #fff;
     border: none;
@@ -551,14 +557,14 @@
     height: 58px;
     font-size: 1.5rem;
     cursor: pointer;
-    box-shadow: 0 6px 24px rgba(232,67,10,0.4);
+    box-shadow: 0 6px 24px rgba(232,67,10,0.45);
     z-index: 99;
     display: none;
     align-items: center;
     justify-content: center;
     transition: transform 0.2s;
   }
-  .float-cart:hover { transform: scale(1.1); }
+  .float-cart:active { transform: scale(0.93); }
   .float-cart .float-count {
     position: absolute;
     top: -4px;
@@ -579,36 +585,79 @@
   .divider {
     border: none;
     border-top: 2px dashed var(--border);
-    margin: 16px 0;
+    margin: 14px 0;
   }
 
   .text-muted { color: var(--muted); font-size: 0.88rem; }
   .fw-bold { font-weight: 800; }
 
-  /* LOCATION INPUT */
+  /* LOCATION BUTTON */
   .loc-btn {
     display: flex;
     align-items: center;
     gap: 10px;
     width: 100%;
-    padding: 12px 16px;
+    padding: 14px 16px;
     border: 2px solid var(--border);
     border-radius: 12px;
     background: var(--bg);
     font-family: 'Nunito', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     font-weight: 700;
     color: var(--text);
     cursor: pointer;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
+    min-height: 50px;
+    text-align: left;
   }
-  .loc-btn:hover { border-color: var(--primary); }
+  .loc-btn:active { border-color: var(--primary); }
   .loc-btn.got { border-color: var(--green); color: var(--green); background: #EAFAF1; }
 
+  /* COURIER BADGE */
+  .courier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: #EBF5FB;
+    color: var(--blue);
+    margin-top: 6px;
+  }
+
+  /* ADMIN ORDER BUTTONS */
+  .admin-order-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .admin-order-btns .btn {
+    padding: 10px 6px;
+    font-size: 0.8rem;
+    margin-top: 0;
+    min-height: 42px;
+  }
+
+  /* LOGIN BOX */
+  .login-box {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 28px 20px;
+    max-width: 380px;
+    margin: 32px auto;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+  }
+
   /* RESPONSIVE */
-  @media (max-width: 480px) {
-    .menu-grid { grid-template-columns: 1fr 1fr; }
-    .admin-nav { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 360px) {
+    .menu-grid { gap: 10px; }
+    .menu-item { padding: 12px 8px; }
+    .menu-item .food-emoji { font-size: 2rem; }
+    .tab-btn { font-size: 0.62rem; }
   }
 </style>
 </head>
@@ -617,8 +666,11 @@
 <!-- HEADER -->
 <header class="header">
   <div class="header-inner">
-    <div class="logo" id="secretLogo" onclick="secretTap()" style="cursor:default;user-select:none">Qopoq <span>Somsa</span> 🥙</div>
-    <div id="secretHint" style="font-size:0.72rem;color:rgba(255,255,255,0.5);font-weight:700;letter-spacing:0.5px;transition:opacity 0.3s;opacity:0"></div>
+    <div class="logo" id="secretLogo" onclick="secretTap()">Qopoq <span>Somsa</span> 🥙</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button id="langBtn" onclick="toggleLang()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:6px 12px;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.8rem;cursor:pointer;min-height:32px">🇷🇺 RU</button>
+      <div id="secretHint"></div>
+    </div>
   </div>
 </header>
 
@@ -638,17 +690,15 @@
         <span class="icon">🍴</span> Menyu
       </button>
       <button class="tab-btn" onclick="showTab('cart')" id="tab-cart">
-        <span class="icon">🛒</span> Savatcha
+        <span class="icon">🛒</span> Savat
       </button>
       <button class="tab-btn" onclick="showTab('orders')" id="tab-orders">
-        <span class="icon">🗂</span> Buyurtmalar
+        <span class="icon">🗂</span> Buyurtma
       </button>
       <button class="tab-btn" onclick="showTab('contact')" id="tab-contact">
         <span class="icon">📞</span> Aloqa
       </button>
     </div>
-
-    <!-- MENU TAB -->
     <div id="tab-content-menu">
       <div class="card">
         <div class="card-title">🍴 Menyu</div>
@@ -675,11 +725,11 @@
     <!-- CONTACT TAB -->
     <div id="tab-content-contact" style="display:none">
       <div class="card">
-        <div class="card-title">📞 Aloqa</div>
-        <div class="contact-item"><span class="ci-icon">👤</span> Admin: <a href="https://t.me/shaxriiyar" style="color:var(--primary);font-weight:800;text-decoration:none">@shaxriiyar</a></div>
-        <div class="contact-item"><span class="ci-icon">📍</span> Toshkent shahri</div>
+        <div class="card-title">📞 Aloqa / Контакты</div>
+        <div class="contact-item"><span class="ci-icon">👤</span> Admin: <a href="https://t.me/admin" style="color:var(--primary);font-weight:800;text-decoration:none">@admin</a></div>
+        <div class="contact-item"><span class="ci-icon">📍</span> Toshkent / Ташкент</div>
         <div class="contact-item"><span class="ci-icon">⏰</span> 10:00 — 22:00</div>
-        <div class="contact-item"><span class="ci-icon">🚚</span> Yetkazib berish: BEPUL</div>
+        <div class="contact-item"><span class="ci-icon">🚚</span> Yetkazib berish: BEPUL / Доставка: БЕСПЛАТНО</div>
       </div>
     </div>
 
@@ -689,9 +739,9 @@
 <!-- ========== ADMIN PANEL ========== -->
 <div class="panel" id="panel-admin">
   <div class="container">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--primary-dark)">🛠 Admin panel</div>
-      <button onclick="setRole('customer')" style="background:var(--border);border:none;border-radius:20px;padding:7px 16px;font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:var(--muted)">🏠 Chiqish</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--primary-dark)">🛠 Admin / Админ</div>
+      <button onclick="setRole('customer')" style="background:var(--border);border:none;border-radius:20px;padding:8px 16px;font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:var(--muted);min-height:38px">🏠</button>
     </div>
 
     <div class="admin-nav">
@@ -709,26 +759,26 @@
     <!-- ADMIN MENU SECTION -->
     <div class="admin-section active" id="asec-menu">
       <div class="card">
-        <div class="card-title">🍽 Menyu boshqaruvi</div>
+        <div class="card-title">🍽 Menyu / Меню</div>
         <div id="adminMenuList"></div>
         <hr class="divider">
-        <div style="font-weight:800;margin-bottom:12px;color:var(--muted)">➕ Yangi taom qo'shish</div>
+        <div style="font-weight:800;margin-bottom:12px;color:var(--muted)">➕ Yangi taom / Новое блюдо</div>
         <div class="form-group">
-          <label>Emoji + Nomi</label>
+          <label>Emoji + Nomi / Название</label>
           <input type="text" id="newItemName" placeholder="🍔 Burger nomi">
         </div>
         <div class="form-group">
-          <label>Narxi (so'm)</label>
-          <input type="number" id="newItemPrice" placeholder="30000">
+          <label>Narxi (so'm) / Цена (сум)</label>
+          <input type="number" id="newItemPrice" placeholder="30000" inputmode="numeric">
         </div>
-        <button class="btn btn-primary" onclick="addMenuItem()">✅ Qo'shish</button>
+        <button class="btn btn-primary" onclick="addMenuItem()">✅ Qo'shish / Добавить</button>
       </div>
     </div>
 
     <!-- ADMIN ORDERS SECTION -->
     <div class="admin-section" id="asec-orders">
       <div class="card">
-        <div class="card-title">📦 Faol buyurtmalar</div>
+        <div class="card-title">📦 Faol buyurtmalar / Активные заказы</div>
         <div id="adminOrdersContent"></div>
       </div>
     </div>
@@ -744,16 +794,16 @@
 <!-- ========== COURIER PANEL ========== -->
 <div class="panel" id="panel-courier">
   <div class="container">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <div class="card-title" id="courierPanelTitle" style="margin-bottom:0">🚗 Kuryer paneli</div>
-      <button onclick="setRole('customer')" style="background:var(--border);border:none;border-radius:20px;padding:7px 16px;font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:var(--muted)">🏠 Chiqish</button>
+      <button onclick="setRole('customer')" style="background:var(--border);border:none;border-radius:20px;padding:8px 16px;font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:var(--muted);min-height:38px">🏠</button>
+    </div>
+    <div class="stat-box" style="margin-bottom:14px">
+      <div class="stat-num" id="courierDoneCount">0</div>
+      <div class="stat-label">🏁 Bugun topshirilgan / Доставлено сегодня</div>
     </div>
     <div class="card">
       <div id="courierContent"></div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-num" id="courierDoneCount">0</div>
-      <div class="stat-label">🏁 Bugun topshirilgan buyurtmalar</div>
     </div>
   </div>
 </div>
@@ -770,10 +820,10 @@
 <div class="modal-overlay" id="editModal">
   <div class="modal" style="position:relative">
     <button class="modal-close" onclick="closeModal('editModal')">✕</button>
-    <div class="modal-title">✏️ Narxni o'zgartirish</div>
+    <div class="modal-title">✏️ Narx / Цена</div>
     <div class="form-group">
-      <label>Yangi narx (so'm)</label>
-      <input type="number" id="editPriceInput" placeholder="35000">
+      <label>Yangi narx (so'm) / Новая цена (сум)</label>
+      <input type="number" id="editPriceInput" placeholder="35000" inputmode="numeric">
     </div>
     <button class="btn btn-primary" onclick="saveEditPrice()">✅ Saqlash</button>
   </div>
@@ -795,6 +845,19 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <script>
+// ============ TELEGRAM MINI APP INIT ============
+(function() {
+  if (window.Telegram && window.Telegram.WebApp) {
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    // Telegram ranglarini o'rnatish (agar dark mode bo'lsa)
+    if (tg.colorScheme === 'dark') {
+      // Hozircha light theme saqlanadi
+    }
+  }
+})();
+
 // ============ FIREBASE INIT ============
 const firebaseConfig = {
   apiKey: "AIzaSyBySLs6SwLVYQjmhRiM7Ixe8VIxLSRzKJA",
@@ -815,45 +878,244 @@ const courierStatsRef = db.ref('courierStats');
 
 <script>
 // ============ DATA ============
-const ADMIN_ID = "8030496668";
-const ADMIN_USERNAME = "@shaxriiyar";
+const ADMIN_ID = "w777";
+const ADMIN_USERNAME = "@admin";
 const KARTA_RAQAM = "8600 0000 0000 0000";
 const KARTA_EGASI = "Falonchi Pistonchiyev";
 
 const COURIERS = [
   { id: "8030496668", name: "Shahriyor" },
-  { id: "222222222", name: "Ali" }
+  { id: "222222222",  name: "Ali" }
 ];
 
-// menu Firebase dan yuklanadi — dastlab bo'sh
+// menu Firebase dan yuklanadi
 let menu = [];
 let menuLoaded = false;
 
 let cart = [];
-let orders = {};       // Firebase dan real-time yuklanadi
+let orders = {};
 let orderCounter = 1;
-let stats = { totalSum: 0, items: {} };
 let courierStats = {};
-let currentUserId = localStorage.getItem('qopoq_userId');
+let currentUserId = null;
+
+// localStorage xavfsiz ishlatish
+try {
+  currentUserId = localStorage.getItem('qopoq_userId');
+} catch(e) {}
 if (!currentUserId) {
   currentUserId = "user_" + Math.random().toString(36).substr(2,10);
-  localStorage.setItem('qopoq_userId', currentUserId);
+  try { localStorage.setItem('qopoq_userId', currentUserId); } catch(e) {}
 }
+
 let currentRole = 'customer';
 let currentCourierId = null;
 let editingItemId = null;
 let ordersLoaded = false;
+let currentTab = 'menu';
+
+// ============ COURIER PINS ============
+const COURIER_PINS = {
+  "8030496668": "1234",  // Shahriyor
+  "222222222":  "2222"   // Ali
+};
+
+// ============ LANGUAGE SYSTEM ============
+let currentLang = 'uz';
+try { currentLang = localStorage.getItem('qopoq_lang') || 'uz'; } catch(e) {}
+
+const LANG = {
+  uz: {
+    menu: 'Menyu', cart: 'Savat', orders: 'Buyurtma', contact: 'Aloqa',
+    menuTitle: '🍴 Menyu', cartTitle: '🛒 Savatchangiz', ordersTitle: '🗂 Buyurtmalarim',
+    contactTitle: '📞 Aloqa',
+    addBtn: '+ Qo\'shish', cartEmpty: 'Savatcha bo\'sh', ordersEmpty: 'Hali buyurtma berilmagan',
+    total: '💰 Jami:', orderBtn: '✅ Buyurtma berish', clearBtn: '🗑 Tozalash',
+    phone: '📞 Telefon raqamingiz', phoneLabel: 'Raqamingizni kiriting',
+    phonePlaceholder: '+998901234567', phoneContinue: 'Davom etish →',
+    phoneError: 'Telefon raqamni to\'g\'ri kiriting!',
+    location: '📍 Manzilingiz', street: 'Ko\'cha, uy raqami',
+    streetPlaceholder: 'Masalan: Chilonzor, 7-kvartal, 12-uy',
+    gpsBtn: 'GPS lokatsiyani olish', gpsGot: '✅ Lokatsiya olindi', gpsWait: '⏳ Aniqlanmoqda...',
+    gpsFail: '❌ GPS ishlamadi – manzil yozing', gpsError: 'GPS ruxsat berilmadi. Manzilni yozing.',
+    locationError: 'Manzil yozing yoki GPS ni bosing!',
+    payment: '💳 To\'lov turi', cashBtn: '💵 Naqd pul', cardBtn: '💳 Karta',
+    back: '← Orqaga', orderDone: '✅ Buyurtma qabul qilindi!',
+    payInfo: '💳 To\'lov ma\'lumotlari', payNote: '⚠️ To\'lovni qilgach, to\'lov chekini adminga yuboring:',
+    ok: '✅ Tushunarli', cancelBtn: '🚫 Bekor qilish',
+    menuLoading: 'Menyu yuklanmoqda...', menuEmpty: 'Menyu bo\'sh',
+    orderAccepted: '✅ Buyurtma qabul qilindi!', cartEmptyMsg: 'Savatcha bo\'sh!',
+    cartCleared: 'Savatcha tozalandi',
+    adminPanel: '🛠 Admin panel', adminExit: '🏠 Chiqish',
+    adminMenu: '🍽 Menyu', adminOrders: '📦 Buyurtmalar', adminReport: '📊 Hisobot',
+    menuManage: '🍽 Menyu boshqaruvi', addItem: '➕ Yangi taom qo\'shish',
+    itemName: 'Emoji + Nomi', itemNamePh: '🍔 Burger nomi',
+    itemPrice: 'Narxi (so\'m)', itemPricePh: '30000', addItemBtn: '✅ Qo\'shish',
+    activeOrders: '📦 Faol buyurtmalar', noActiveOrders: 'Faol buyurtmalar yo\'q',
+    cookBtn: '👨‍🍳 Tayyorlash', courierBtn: '🚚 Kuryerga berish',
+    busyBtn: '⏳ Ko\'p buyurtma', rejectBtn: '❌ Rad etish',
+    courierPanel: '🚗 Kuryer paneli', courierExit: '🏠 Chiqish',
+    courierStat: '🏁 Bugun topshirilgan buyurtmalar', courierEmpty: 'Hozircha buyurtma yo\'q',
+    acceptBtn: '✅ Qabul qildim', doneBtn: '🏁 Topshirdim',
+    mapLink: 'Xaritada ko\'rish 🗺', noAddress: 'Manzil yo\'q',
+    loginTitle: 'Maxfiy kirish', adminLoginBtn: '🛠 Admin', courierLoginBtn: '🚗 Kuryer',
+    adminPass: 'Admin paroli', adminPassPh: '••••••••', loginBtn: '✅ Kirish',
+    courierSelect: 'Kuryer tanlang', courierSelectPh: '— Tanlang —',
+    courierPin: 'Kuryer PIN kodi', courierPinPh: '••••',
+    wrongPass: '❌ Noto\'g\'ri parol!', selectCourier: 'Kuryerni tanlang!',
+    enterPin: 'PIN kiriting!', wrongPin: '❌ Noto\'g\'ri PIN!',
+    tapHint: '🔐 {n} ta qoldi...', editPrice: '✏️ Narxni o\'zgartirish',
+    newPrice: 'Yangi narx (so\'m)', saveBtn: '✅ Saqlash',
+    reportTitle: '📊 Kunlik hisobot', activeCount: 'Faol buyurtmalar',
+    doneCount: 'Yakunlangan', courierStat2: '🚗 Kuryer statistikasi',
+    deliveredCount: 'ta topshirildi', totalRevenue: '💰 Jami tushum (yetkazilganlar)',
+    adminContactTitle: '📞 Aloqa',
+    contactAdmin: 'Admin:', contactCity: 'Toshkent shahri',
+    contactHours: '10:00 — 22:00', contactDelivery: 'Yetkazib berish: BEPUL',
+    cash: '💵 Naqd pul', card: '💳 Karta',
+    newOrder: '🆕 *YANGI BUYURTMA*', orderContents: '📋 *Tarkibi:*',
+    orderTotal: '💰 *Jami:', orderPay: '💳 *To\'lov:*', orderPhone: '📞 *Tel:*',
+    orderTime: '🕐 *Vaqt:*', gpsLabel: '📍 GPS lokatsiya yuborildi',
+    cardPay: "💳 Karta (to'lov cheki kutilmoqda)", cashPay: "💵 Naqd pul",
+    courierOrder: '🚚 *YANGI BUYURTMA — Kuryer*', courierPhone: '📞 *Mijoz tel:*',
+    gpsBelow: '📍 GPS lokatsiya quyida', noLoc: "📍 Manzil: Ko'rsatilmagan",
+    cooking: 'Tayyorlanmoqda 👨‍🍳', onWay: 'Yo\'lda 🚚',
+    assigned: 'Kuryerga berildi 🚚', delivered: 'Yetkazib berildi ✅',
+    rejected: 'Rad etildi ❌', newStatus: 'Yangi 🆕',
+    menuLoaded: 'Menyu yuklanmoqda...', priceError: 'Narx noto\'g\'ri!',
+    nameError: 'Nom kiriting!', priceEnter: 'Narx kiriting!',
+    deleted: 'O\'chirildi ✅', updated: '✅ Yangilandi!',
+    noName: 'Manzil yo\'q',
+  },
+  ru: {
+    menu: 'Меню', cart: 'Корзина', orders: 'Заказы', contact: 'Контакты',
+    menuTitle: '🍴 Меню', cartTitle: '🛒 Ваша корзина', ordersTitle: '🗂 Мои заказы',
+    contactTitle: '📞 Контакты',
+    addBtn: '+ Добавить', cartEmpty: 'Корзина пуста', ordersEmpty: 'Заказов пока нет',
+    total: '💰 Итого:', orderBtn: '✅ Оформить заказ', clearBtn: '🗑 Очистить',
+    phone: '📞 Ваш номер телефона', phoneLabel: 'Введите ваш номер',
+    phonePlaceholder: '+998901234567', phoneContinue: 'Продолжить →',
+    phoneError: 'Введите правильный номер телефона!',
+    location: '📍 Ваш адрес', street: 'Улица, номер дома',
+    streetPlaceholder: 'Например: Чиланзар, 7-квартал, дом 12',
+    gpsBtn: 'Получить GPS-локацию', gpsGot: '✅ Локация получена', gpsWait: '⏳ Определение...',
+    gpsFail: '❌ GPS не работает – введите адрес', gpsError: 'GPS доступ запрещён. Введите адрес.',
+    locationError: 'Введите адрес или нажмите GPS!',
+    payment: '💳 Способ оплаты', cashBtn: '💵 Наличные', cardBtn: '💳 Карта',
+    back: '← Назад', orderDone: '✅ Заказ принят!',
+    payInfo: '💳 Данные для оплаты', payNote: '⚠️ После оплаты отправьте чек администратору:',
+    ok: '✅ Понятно', cancelBtn: '🚫 Отменить',
+    menuLoading: 'Загрузка меню...', menuEmpty: 'Меню пусто',
+    orderAccepted: '✅ Заказ принят!', cartEmptyMsg: 'Корзина пуста!',
+    cartCleared: 'Корзина очищена',
+    adminPanel: '🛠 Панель администратора', adminExit: '🏠 Выйти',
+    adminMenu: '🍽 Меню', adminOrders: '📦 Заказы', adminReport: '📊 Отчёт',
+    menuManage: '🍽 Управление меню', addItem: '➕ Добавить новое блюдо',
+    itemName: 'Emoji + Название', itemNamePh: '🍔 Бургер',
+    itemPrice: 'Цена (сум)', itemPricePh: '30000', addItemBtn: '✅ Добавить',
+    activeOrders: '📦 Активные заказы', noActiveOrders: 'Активных заказов нет',
+    cookBtn: '👨‍🍳 Готовить', courierBtn: '🚚 Передать курьеру',
+    busyBtn: '⏳ Много заказов', rejectBtn: '❌ Отклонить',
+    courierPanel: '🚗 Панель курьера', courierExit: '🏠 Выйти',
+    courierStat: '🏁 Доставлено сегодня', courierEmpty: 'Заказов пока нет',
+    acceptBtn: '✅ Принял', doneBtn: '🏁 Доставлено',
+    mapLink: 'Открыть на карте 🗺', noAddress: 'Адрес не указан',
+    loginTitle: 'Секретный вход', adminLoginBtn: '🛠 Администратор', courierLoginBtn: '🚗 Курьер',
+    adminPass: 'Пароль администратора', adminPassPh: '••••••••', loginBtn: '✅ Войти',
+    courierSelect: 'Выберите курьера', courierSelectPh: '— Выбрать —',
+    courierPin: 'PIN-код курьера', courierPinPh: '••••',
+    wrongPass: '❌ Неверный пароль!', selectCourier: 'Выберите курьера!',
+    enterPin: 'Введите PIN!', wrongPin: '❌ Неверный PIN!',
+    tapHint: '🔐 Осталось {n}...', editPrice: '✏️ Изменить цену',
+    newPrice: 'Новая цена (сум)', saveBtn: '✅ Сохранить',
+    reportTitle: '📊 Дневной отчёт', activeCount: 'Активные заказы',
+    doneCount: 'Завершённые', courierStat2: '🚗 Статистика курьеров',
+    deliveredCount: 'доставлено', totalRevenue: '💰 Общий доход (доставленные)',
+    adminContactTitle: '📞 Контакты',
+    contactAdmin: 'Админ:', contactCity: 'г. Ташкент',
+    contactHours: '10:00 — 22:00', contactDelivery: 'Доставка: БЕСПЛАТНО',
+    cash: '💵 Наличные', card: '💳 Карта',
+    newOrder: '🆕 *НОВЫЙ ЗАКАЗ*', orderContents: '📋 *Состав:*',
+    orderTotal: '💰 *Итого:', orderPay: '💳 *Оплата:*', orderPhone: '📞 *Тел:*',
+    orderTime: '🕐 *Время:*', gpsLabel: '📍 GPS-локация отправлена',
+    cardPay: "💳 Карта (ожидается чек оплаты)", cashPay: "💵 Наличные",
+    courierOrder: '🚚 *НОВЫЙ ЗАКАЗ — Курьер*', courierPhone: '📞 *Тел клиента:*',
+    gpsBelow: '📍 GPS-локация ниже', noLoc: "📍 Адрес: Не указан",
+    cooking: 'Готовится 👨‍🍳', onWay: 'В пути 🚚',
+    assigned: 'Передан курьеру 🚚', delivered: 'Доставлен ✅',
+    rejected: 'Отклонён ❌', newStatus: 'Новый 🆕',
+    menuLoaded: 'Загрузка меню...', priceError: 'Неверная цена!',
+    nameError: 'Введите название!', priceEnter: 'Введите цену!',
+    deleted: 'Удалено ✅', updated: '✅ Обновлено!',
+    noName: 'Адрес не указан',
+  }
+};
+
+function t(key) {
+  return (LANG[currentLang] || LANG.uz)[key] || key;
+}
+
+function toggleLang() {
+  currentLang = currentLang === 'uz' ? 'ru' : 'uz';
+  try { localStorage.setItem('qopoq_lang', currentLang); } catch(e) {}
+  const btn = document.getElementById('langBtn');
+  if (btn) btn.textContent = currentLang === 'uz' ? '🇷🇺 RU' : '🇺🇿 UZ';
+  applyLang();
+}
+
+function applyLang() {
+  // Nav tabs
+  const tabMenu = document.getElementById('tab-menu');
+  const tabCart = document.getElementById('tab-cart');
+  const tabOrders = document.getElementById('tab-orders');
+  const tabContact = document.getElementById('tab-contact');
+  if (tabMenu) tabMenu.innerHTML = `<span class="icon">🍴</span> ${t('menu')}`;
+  if (tabCart) tabCart.innerHTML = `<span class="icon">🛒</span> ${t('cart')}`;
+  if (tabOrders) tabOrders.innerHTML = `<span class="icon">🗂</span> ${t('orders')}`;
+  if (tabContact) tabContact.innerHTML = `<span class="icon">📞</span> ${t('contact')}`;
+
+  // Contact section
+  const contactCard = document.querySelector('#tab-content-contact .card-title');
+  if (contactCard) contactCard.textContent = t('contactTitle');
+  const contactItems = document.querySelectorAll('#tab-content-contact .contact-item');
+  if (contactItems[0]) contactItems[0].innerHTML = `<span class="ci-icon">👤</span> ${t('contactAdmin')} <a href="https://t.me/admin" style="color:var(--primary);font-weight:800;text-decoration:none">@admin</a>`;
+  if (contactItems[1]) contactItems[1].innerHTML = `<span class="ci-icon">📍</span> ${t('contactCity')}`;
+  if (contactItems[2]) contactItems[2].innerHTML = `<span class="ci-icon">⏰</span> ${t('contactHours')}`;
+  if (contactItems[3]) contactItems[3].innerHTML = `<span class="ci-icon">🚚</span> ${t('contactDelivery')}`;
+
+  // Re-render current views
+  renderMenu();
+  if (currentTab === 'cart') renderCart();
+  if (currentTab === 'orders') renderMyOrders();
+  if (currentRole === 'admin') renderAdminOrders();
+  if (currentRole === 'courier') renderCourierOrders();
+}
+
+
+
+// ============ TELEGRAM KONFIGURATSIYA ============
+const TG_TOKEN = "8271852367:AAGKDNXPaVU-HKZjLaGfCgoKK1DI421XbzY";
+const TG_ADMIN = "8030496668"; // Admin Telegram user ID
+const TG_API = `https://api.telegram.org/bot${TG_TOKEN}`;
+
+// Kuryer Telegram ID lari
+const COURIER_TG_IDS = {
+  "8030496668": "8030496668",  // Shahriyor TG ID
+  "222222222":  null           // Ali — hozircha yo'q
+};
 
 // ============ UTILS ============
-function showToast(msg) {
+function showToast(msg, duration = 2500) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), duration);
 }
 
 function openModal(id) {
   document.getElementById(id).classList.add('open');
+  // Telegram keyboard'ini yopish uchun
+  if (document.activeElement) document.activeElement.blur();
 }
 
 function closeModal(id) {
@@ -861,11 +1123,11 @@ function closeModal(id) {
 }
 
 function formatPrice(n) {
+  if (typeof n !== 'number') return '0 so\'m';
   return n.toLocaleString('uz') + " so'm";
 }
 
 // ============ TABS ============
-let currentTab = 'menu';
 function showTab(tab) {
   ['menu','cart','orders','contact'].forEach(t => {
     document.getElementById(`tab-content-${t}`).style.display = 'none';
@@ -877,6 +1139,8 @@ function showTab(tab) {
   if (tab === 'cart') renderCart();
   if (tab === 'orders') renderMyOrders();
   if (tab === 'menu') renderMenu();
+  // Tepaga scroll qilish
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function goToCart() {
@@ -886,29 +1150,33 @@ function goToCart() {
 // ============ MENU ============
 function renderMenu() {
   const grid = document.getElementById('menuGrid');
+  if (!grid) return;
   if (!menuLoaded) {
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:36px;color:var(--muted)">
       <div style="font-size:2rem;margin-bottom:10px">⏳</div>
-      <div style="font-weight:700">Menyu yuklanmoqda...</div>
+      <div style="font-weight:700">${t('menuLoading')}</div>
     </div>`;
     return;
   }
   if (!menu.length) {
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:36px;color:var(--muted)">
       <div style="font-size:2rem;margin-bottom:10px">🍽</div>
-      <div style="font-weight:700">Menyu bo'sh</div>
+      <div style="font-weight:700">${t('menuEmpty')}</div>
     </div>`;
     return;
   }
   grid.innerHTML = menu.map(item => {
     const count = cart.filter(c => c.id === item.id).length;
+    const nameParts = item.name.split(' ');
+    const emoji = nameParts[0];
+    const name = nameParts.slice(1).join(' ') || item.name;
     return `
-      <div class="menu-item" onclick="addToCart('${item.id}')">
+      <div class="menu-item ${count > 0 ? 'selected' : ''}" onclick="addToCart('${item.id}')">
         ${count > 0 ? `<div class="badge">${count}</div>` : ''}
-        <span class="food-emoji">${item.name.split(' ')[0]}</span>
-        <div class="food-name">${item.name.replace(/^\S+\s/, '')}</div>
+        <span class="food-emoji">${emoji}</span>
+        <div class="food-name">${name}</div>
         <div class="food-price">${formatPrice(item.price)}</div>
-        <button class="add-btn" onclick="event.stopPropagation();addToCart('${item.id}')">+ Qo'shish</button>
+        <button class="add-btn" onclick="event.stopPropagation();addToCart('${item.id}')">${t('addBtn')}</button>
       </div>`;
   }).join('');
 }
@@ -918,13 +1186,16 @@ function addToCart(id) {
   if (!item) return;
   cart.push({ ...item, uid: Date.now() + Math.random() });
   updateFloatCart();
-  showToast(`${item.name} qo'shildi ✅`);
+  showToast(`${item.name} ✅`);
   renderMenu();
+  // Hafif vibro (agar qo'llab-quvvatlansa)
+  if (navigator.vibrate) navigator.vibrate(30);
 }
 
 function updateFloatCart() {
   const fc = document.getElementById('floatCart');
   const cnt = document.getElementById('floatCount');
+  if (!fc || !cnt) return;
   cnt.textContent = cart.length;
   fc.style.display = cart.length > 0 ? 'flex' : 'none';
 }
@@ -932,8 +1203,9 @@ function updateFloatCart() {
 // ============ CART ============
 function renderCart() {
   const el = document.getElementById('cartContent');
+  if (!el) return;
   if (!cart.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">🛒</div><p>Savatcha bo'sh</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🛒</div><p>${t('cartEmpty')}</p></div>`;
     return;
   }
   const total = cart.reduce((a, b) => a + b.price, 0);
@@ -946,11 +1218,11 @@ function renderCart() {
       </div>
     `).join('')}
     <div class="cart-total">
-      <span>💰 Jami:</span>
+      <span>${t('total')}</span>
       <span>${formatPrice(total)}</span>
     </div>
-    <button class="btn btn-primary" onclick="startOrder()" style="margin-top:16px">✅ Buyurtma berish</button>
-    <button class="btn btn-secondary" onclick="clearCart()">🗑 Tozalash</button>
+    <button class="btn btn-primary" onclick="startOrder()" style="margin-top:16px">${t('orderBtn')}</button>
+    <button class="btn btn-secondary" onclick="clearCart()">${t('clearBtn')}</button>
   `;
 }
 
@@ -966,14 +1238,14 @@ function clearCart() {
   updateFloatCart();
   renderCart();
   renderMenu();
-  showToast('Savatcha tozalandi');
+  showToast(t('cartCleared'));
 }
 
 // ============ ORDER FLOW ============
 let orderFlow = { step: 0, phone: '', lat: null, lon: null, address: '' };
 
 function startOrder() {
-  if (!cart.length) { showToast('Savatcha bo\'sh!'); return; }
+  if (!cart.length) { showToast(t('cartEmptyMsg')); return; }
   orderFlow = { step: 1, phone: '', lat: null, lon: null, address: '' };
   showOrderStep();
   openModal('orderModal');
@@ -981,216 +1253,260 @@ function startOrder() {
 
 function showOrderStep() {
   const el = document.getElementById('orderModalContent');
+  if (!el) return;
+
   if (orderFlow.step === 1) {
     el.innerHTML = `
       <div class="steps"><div class="step active"></div><div class="step"></div><div class="step"></div></div>
-      <div class="modal-title">📞 Telefon raqamingiz</div>
+      <div class="modal-title">${t('phone')}</div>
       <div class="form-group">
-        <label>Raqamingizni kiriting</label>
-        <input type="tel" id="phoneInput" placeholder="+998901234567" style="font-size:1.1rem;text-align:center;font-weight:800">
+        <label>${t('phoneLabel')}</label>
+        <input type="tel" id="phoneInput" placeholder="${t('phonePlaceholder')}"
+          inputmode="tel"
+          style="font-size:1.1rem;text-align:center;font-weight:800"
+          onkeydown="if(event.key==='Enter')submitPhone()">
       </div>
-      <button class="btn btn-primary" onclick="submitPhone()">Davom etish →</button>
+      <button class="btn btn-primary" onclick="submitPhone()">${t('phoneContinue')}</button>
     `;
+    setTimeout(() => {
+      const inp = document.getElementById('phoneInput');
+      if (inp) inp.focus();
+    }, 400);
+
   } else if (orderFlow.step === 2) {
     el.innerHTML = `
       <div class="steps"><div class="step active"></div><div class="step active"></div><div class="step"></div></div>
-      <div class="modal-title">📍 Manzilingiz</div>
+      <div class="modal-title">${t('location')}</div>
       <div class="form-group">
-        <label>Ko'cha, uy raqami</label>
-        <input type="text" id="addressInput" placeholder="Masalan: Chilonzor, 7-kvartal, 12-uy" value="${orderFlow.address}">
+        <label>${t('street')}</label>
+        <input type="text" id="addressInput" placeholder="${t('streetPlaceholder')}" value="${orderFlow.address}">
       </div>
-      <button class="loc-btn ${orderFlow.lat ? 'got' : ''}" onclick="getLocation()" id="geoBtn">
-        📍 ${orderFlow.lat ? '✅ Lokatsiya olindi' : 'GPS lokatsiyani olish'}
+      <button class="loc-btn ${orderFlow.lat ? 'got' : ''}" onclick="getLocation()" id="geoBtn" style="margin-bottom:12px">
+        📍 ${orderFlow.lat ? t('gpsGot') : t('gpsBtn')}
       </button>
-      <button class="btn btn-primary" style="margin-top:12px" onclick="submitLocation()">Davom etish →</button>
-      <button class="btn btn-secondary" onclick="orderFlow.step=1;showOrderStep()">← Orqaga</button>
+      <button class="btn btn-primary" onclick="submitLocation()">${t('phoneContinue')}</button>
+      <button class="btn btn-secondary" onclick="orderFlow.step=1;showOrderStep()">${t('back')}</button>
     `;
+
   } else if (orderFlow.step === 3) {
     const total = cart.reduce((a, b) => a + b.price, 0);
     el.innerHTML = `
       <div class="steps"><div class="step active"></div><div class="step active"></div><div class="step active"></div></div>
-      <div class="modal-title">💳 To'lov turi</div>
+      <div class="modal-title">${t('payment')}</div>
       <div style="background:var(--bg);border-radius:14px;padding:14px;margin-bottom:16px">
-        ${cart.map(i => `<div style="display:flex;justify-content:space-between;padding:4px 0"><span>${i.name}</span><span style="font-weight:800;color:var(--primary)">${formatPrice(i.price)}</span></div>`).join('')}
+        ${cart.map(i => `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:0.9rem"><span>${i.name}</span><span style="font-weight:800;color:var(--primary)">${formatPrice(i.price)}</span></div>`).join('')}
         <hr class="divider">
-        <div style="display:flex;justify-content:space-between;font-size:1.05rem;font-weight:800"><span>Jami:</span><span style="color:var(--primary)">${formatPrice(total)}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:800"><span>${t('total')}</span><span style="color:var(--primary)">${formatPrice(total)}</span></div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-green" onclick="placeOrder('naqd')">💵 Naqd pul</button>
-        <button class="btn btn-primary" onclick="placeOrder('karta')">💳 Karta</button>
+        <button class="btn btn-green" onclick="placeOrder('naqd')">${t('cashBtn')}</button>
+        <button class="btn btn-primary" onclick="placeOrder('karta')">${t('cardBtn')}</button>
       </div>
-      <button class="btn btn-secondary" onclick="orderFlow.step=2;showOrderStep()">← Orqaga</button>
+      <button class="btn btn-secondary" onclick="orderFlow.step=2;showOrderStep()">${t('back')}</button>
     `;
   }
 }
 
 function submitPhone() {
   const phone = document.getElementById('phoneInput').value.trim();
-  if (!phone || phone.length < 9) { showToast('Telefon raqamni to\'g\'ri kiriting!'); return; }
+  if (!phone || phone.length < 9) {
+    showToast(t('phoneError'));
+    return;
+  }
   orderFlow.phone = phone;
   orderFlow.step = 2;
   showOrderStep();
 }
 
 function getLocation() {
-  if (navigator.geolocation) {
-    document.getElementById('geoBtn').textContent = '⏳ Aniqlanmoqda...';
-    navigator.geolocation.getCurrentPosition(pos => {
+  const btn = document.getElementById('geoBtn');
+  if (!btn) return;
+  if (!navigator.geolocation) {
+    showToast(t('gpsFail'));
+    return;
+  }
+  btn.textContent = t('gpsWait');
+  btn.className = 'loc-btn';
+  btn.disabled = true;
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
       orderFlow.lat = pos.coords.latitude;
       orderFlow.lon = pos.coords.longitude;
-      document.getElementById('geoBtn').className = 'loc-btn got';
-      document.getElementById('geoBtn').textContent = '✅ GPS lokatsiya olindi';
-      showToast('Lokatsiya olindi ✅');
-    }, () => {
-      showToast('GPS ruxsat berilmadi. Manzilni yozing.');
-      document.getElementById('geoBtn').textContent = '📍 GPS ishlamadi';
-    });
-  } else {
-    showToast('GPS qo\'llab-quvvatlanmaydi');
-  }
+      if (btn) {
+        btn.className = 'loc-btn got';
+        btn.textContent = t('gpsGot');
+        btn.disabled = false;
+      }
+      showToast(t('gpsGot'));
+    },
+    (err) => {
+      if (btn) {
+        btn.textContent = t('gpsFail');
+        btn.className = 'loc-btn';
+        btn.disabled = false;
+      }
+      showToast(t('gpsError'));
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
 }
 
 function submitLocation() {
   const addr = document.getElementById('addressInput').value.trim();
-  if (!addr && !orderFlow.lat) { showToast('Manzil yoki lokatsiyani kiriting!'); return; }
+  if (!addr && !orderFlow.lat) {
+    showToast(t('locationError'));
+    return;
+  }
   orderFlow.address = addr;
   orderFlow.step = 3;
   showOrderStep();
 }
 
 // ============ TELEGRAM XABAR YUBORISH ============
-const TG_TOKEN = "8740580495:AAGLyL1oeM-Pu96tFzwvb5Y63uJaPWmGgEI";
-const TG_ADMIN = "8030496668";
-const TG_API = `https://api.telegram.org/bot${TG_TOKEN}`;
-
-// Kuryer Telegram ID lari
-const COURIER_TG_IDS = {
-  "7312694067": "6457425447",  // Shahriyor
-  "222222222":  null           // Ali — hozircha yo'q
-};
-
-async function sendOrderToTelegram(order, orderId) {
-  const payText = order.payType === 'karta' ? "💳 Karta (to'lov cheki kutilmoqda)" : "💵 Naqd pul";
-  const itemsList = order.items.map((i, idx) => `${idx + 1}. ${i.name} — ${i.price.toLocaleString()} so'm`).join('\n');
-  const locationLine = order.latitude
-    ? `📍 GPS lokatsiya yuborildi`
-    : `📍 Manzil: ${order.address || "Ko'rsatilmagan"}`;
-
-  const text =
-`🆕 *YANGI BUYURTMA #${orderId}*
-
-📋 *Tarkibi:*
-${itemsList}
-
-💰 *Jami: ${order.total.toLocaleString()} so'm*
-💳 *To'lov:* ${payText}
-
-📞 *Tel:* ${order.phone}
-${locationLine}
-🕐 *Vaqt:* ${order.timestamp}`;
-
+async function sendTelegramMessage(chatId, text) {
   try {
-    await fetch(`${TG_API}/sendMessage`, {
+    const res = await fetch(`${TG_API}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        chat_id: TG_ADMIN,
-        text,
+        chat_id: chatId,
+        text: text,
         parse_mode: 'Markdown'
       })
     });
-
-    if (order.latitude && order.longitude) {
-      await fetch(`${TG_API}/sendLocation`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: TG_ADMIN,
-          latitude: order.latitude,
-          longitude: order.longitude
-        })
-      });
+    const data = await res.json();
+    if (!data.ok) {
+      console.error('Telegram xabar xatoligi:', data);
     }
+    return data.ok;
   } catch (err) {
-    console.error('Telegram xabar yuborishda xatolik:', err);
+    console.error('Telegram sendMessage xatolik:', err);
+    return false;
+  }
+}
+
+async function sendTelegramLocation(chatId, lat, lon) {
+  try {
+    await fetch(`${TG_API}/sendLocation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        latitude: lat,
+        longitude: lon
+      })
+    });
+  } catch (err) {
+    console.error('Telegram sendLocation xatolik:', err);
+  }
+}
+
+async function sendOrderToTelegram(order, orderId) {
+  const payText = order.payType === 'karta'
+    ? t('cardPay')
+    : t('cashPay');
+  const itemsList = order.items.map((i, idx) =>
+    `${idx + 1}. ${i.name} — ${(i.price||0).toLocaleString()} so'm`
+  ).join('\n');
+  const locationLine = (order.latitude && order.longitude)
+    ? t('gpsLabel')
+    : `📍 ${currentLang==='ru'?'Адрес':'Manzil'}: ${order.address || (currentLang==='ru'?"Не указан":"Ko'rsatilmagan")}`;
+
+  const text =
+`🆕 *${currentLang==='ru'?'НОВЫЙ ЗАКАЗ':'YANGI BUYURTMA'}*
+
+📋 *${currentLang==='ru'?'Состав':'Tarkibi'}:*
+${itemsList}
+
+💰 *${currentLang==='ru'?'Итого':'Jami'}: ${(order.total||0).toLocaleString()} so'm*
+💳 *${currentLang==='ru'?'Оплата':'To\'lov'}:* ${payText}
+
+📞 *${currentLang==='ru'?'Тел':'Tel'}:* ${order.phone}
+${locationLine}
+🕐 *${currentLang==='ru'?'Время':'Vaqt'}:* ${order.timestamp}`;
+
+  const ok = await sendTelegramMessage(TG_ADMIN, text);
+  if (!ok) console.error('Adminga xabar yuborilmadi!');
+  if (order.latitude && order.longitude) {
+    await sendTelegramLocation(TG_ADMIN, order.latitude, order.longitude);
   }
 }
 
 async function sendOrderToCourier(order, orderId, courierTgId, courierName) {
-  const payText = order.payType === 'karta' ? "💳 Karta" : "💵 Naqd pul";
-  const itemsList = order.items.map((i, idx) => `${idx + 1}. ${i.name} — ${i.price.toLocaleString()} so'm`).join('\n');
+  if (!courierTgId) return;
+
+  const payText = order.payType === 'karta' ? "💳 Karta / Карта" : "💵 Naqd / Наличные";
+  const itemsList = order.items.map((i, idx) =>
+    `${idx + 1}. ${i.name} — ${(i.price||0).toLocaleString()} so'm`
+  ).join('\n');
+  const locationLine = (order.latitude && order.longitude)
+    ? `📍 GPS lokatsiya quyida / GPS ниже`
+    : `📍 ${order.address || "Manzil yo'q / Адрес не указан"}`;
 
   const text =
-`🚚 *YANGI BUYURTMA — ${courierName}*
+`🚚 *YANGI BUYURTMA / НОВЫЙ ЗАКАЗ*
 
-📋 *Tarkibi:*
+📋 *Tarkibi / Состав:*
 ${itemsList}
 
-💰 *Jami: ${order.total.toLocaleString()} so'm*
-💳 *To'lov:* ${payText}
+💰 *Jami / Итого: ${(order.total||0).toLocaleString()} so'm*
+💳 *To'lov / Оплата:* ${payText}
 
-📞 *Mijoz tel:* ${order.phone}
-📍 *Manzil:* ${order.address || "GPS (quyida)"}
-🕐 *Vaqt:* ${order.timestamp}`;
+📞 *Mijoz tel / Тел клиента:* ${order.phone}
+${locationLine}
+🕐 *Vaqt / Время:* ${order.timestamp}`;
 
-  try {
-    await fetch(`${TG_API}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: courierTgId,
-        text,
-        parse_mode: 'Markdown'
-      })
-    });
+  const ok = await sendTelegramMessage(courierTgId, text);
+  if (!ok) {
+    console.error(`Kuryerga xabar yuborilmadi!`);
+    showToast(`⚠️ Kuryerga SMS yuborilmadi!`, 3000);
+  }
 
-    // GPS lokatsiya borsa kuryerga ham yuboramiz
-    if (order.latitude && order.longitude) {
-      await fetch(`${TG_API}/sendLocation`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: courierTgId,
-          latitude: order.latitude,
-          longitude: order.longitude
-        })
-      });
-    }
-  } catch (err) {
-    console.error('Kuryerga Telegram xabar yuborishda xatolik:', err);
+  if (order.latitude && order.longitude) {
+    await sendTelegramLocation(courierTgId, order.latitude, order.longitude);
   }
 }
 
+// ============ BUYURTMA BERISH ============
 function placeOrder(payType) {
   const total = cart.reduce((a, b) => a + b.price, 0);
 
   const newOrderRef = ordersRef.push();
   const orderId = newOrderRef.key;
 
+  // Firebase'da null saqlanmaydi — faqat haqiqiy qiymatlar saqlanadi
   const orderData = {
     userId: currentUserId,
     phone: orderFlow.phone,
-    address: orderFlow.address,
-    latitude: orderFlow.lat,
-    longitude: orderFlow.lon,
-    items: [...cart],
+    address: orderFlow.address || '',
+    items: cart.map(i => ({ id: i.id, name: i.name, price: i.price })),
     total,
     payType,
-    status: 'Yangi',
+    status: 'Yangi 🆕',
     statusClass: 'new',
     lockCancel: false,
     courierId: null,
-    timestamp: new Date().toLocaleTimeString('uz'),
+    timestamp: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }),
     deliveredByCourier: false
   };
 
-  // Firebase ga yozish
+  // GPS faqat mavjud bo'lsa qo'shamiz
+  if (orderFlow.lat && orderFlow.lon) {
+    orderData.latitude = orderFlow.lat;
+    orderData.longitude = orderFlow.lon;
+  }
+
+  // Firebase ga yozish + Telegram ga yuborish
   newOrderRef.set(orderData)
     .then(() => {
       // Adminga Telegram orqali xabar yuborish
       sendOrderToTelegram(orderData, orderId);
     })
-    .catch(err => console.error('Firebase order yozishda xatolik:', err));
+    .catch(err => {
+      console.error('Firebase order xatoligi:', err);
+      showToast('⚠️ Buyurtma saqlanmadi, internet tekshiring!', 4000);
+    });
 
   cart = [];
   updateFloatCart();
@@ -1198,7 +1514,7 @@ function placeOrder(payType) {
 
   if (payType === 'naqd') {
     closeModal('orderModal');
-    showToast(`✅ Buyurtma qabul qilindi!`);
+    showToast(t('orderAccepted'));
     showTab('orders');
   } else {
     showCardPayInfo(orderId, total);
@@ -1208,50 +1524,88 @@ function placeOrder(payType) {
 function showCardPayInfo(orderId, total) {
   const el = document.getElementById('orderModalContent');
   el.innerHTML = `
-    <div class="modal-title">✅ Buyurtma #${orderId} qabul qilindi!</div>
+    <div class="modal-title">${t('orderDone')}</div>
     <div class="pay-card-box">
-      <div style="font-size:0.85rem;opacity:0.7">💳 To'lov ma'lumotlari</div>
+      <div style="font-size:0.82rem;opacity:0.7">${t('payInfo')}</div>
       <div class="card-number">${KARTA_RAQAM}</div>
       <div class="card-owner">👤 ${KARTA_EGASI}</div>
       <div class="card-amount">${formatPrice(total)}</div>
     </div>
-    <div style="background:#FFF9E6;border-radius:12px;padding:14px;font-size:0.88rem;line-height:1.6;color:#7A5C00;font-weight:700;border:1.5px solid #FFD166">
-      ⚠️ To'lovni qilgach, to'lov chekini <strong>#${orderId}-buyurtma</strong> deb adminga yuboring:<br>
-      <a href="https://t.me/shaxriiyar" style="color:var(--primary)">${ADMIN_USERNAME}</a>
+    <div style="background:#FFF9E6;border-radius:12px;padding:14px;font-size:0.86rem;line-height:1.7;color:#7A5C00;font-weight:700;border:1.5px solid #FFD166">
+      ${t('payNote')}<br>
+      <a href="https://t.me/admin" style="color:var(--primary)">${ADMIN_USERNAME}</a>
     </div>
-    <button class="btn btn-primary" style="margin-top:16px" onclick="closeModal('orderModal');showTab('orders');renderMyOrders()">✅ Tushunarli</button>
+    <button class="btn btn-primary" style="margin-top:16px" onclick="closeModal('orderModal');showTab('orders');renderMyOrders()">${t('ok')}</button>
   `;
 }
 
 // ============ MY ORDERS ============
 function renderMyOrders() {
   const el = document.getElementById('ordersContent');
-  const myOrders = Object.keys(orders).filter(id => orders[id].userId === currentUserId);
+  if (!el) return;
+  const now = Date.now();
+  const TEN_MIN = 10 * 60 * 1000;
+
+  // Faqat o'chib ketmagan buyurtmalarni ko'rsat
+  const myOrders = Object.keys(orders).filter(id => {
+    const o = orders[id];
+    if (o.userId !== currentUserId) return false;
+    // Yetkazilgan yoki rad etilganlar 10 daqiqadan keyin ko'rinmasin
+    if ((o.deliveredByCourier === true || o.statusClass === 'cancelled') && o.finishedAt) {
+      if ((now - o.finishedAt) >= TEN_MIN) return false;
+    }
+    return true;
+  });
+
   if (!myOrders.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><p>Faol buyurtmalar yo'q</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><p>${t('ordersEmpty')}</p></div>`;
     return;
   }
-  el.innerHTML = myOrders.map(id => {
+  const sorted = myOrders.slice().reverse();
+  el.innerHTML = sorted.map(id => {
     const o = orders[id];
     const canCancel = !o.lockCancel;
     const isDelivered = o.deliveredByCourier === true;
+    const isCancelled = o.statusClass === 'cancelled';
+    const isFinished = isDelivered || isCancelled;
+
+    // Countdown ko'rsatish
+    let countdownHtml = '';
+    if (isFinished && o.finishedAt) {
+      const msLeft = TEN_MIN - (now - o.finishedAt);
+      const minLeft = Math.max(0, Math.ceil(msLeft / 60000));
+      countdownHtml = `<div style="font-size:0.78rem;color:var(--muted);margin-top:6px">🕐 ${minLeft} ${currentLang==='ru'?'мин. и исчезнет':'daqiqada yo\'qoladi'}</div>`;
+    }
+
     return `
-      <div class="order-card status-${isDelivered ? 'done' : o.statusClass}">
-        <div class="order-id">📦 Buyurtma · ${o.timestamp}</div>
-        <div class="order-items">${o.items.map(i => i.name).join(', ')}</div>
+      <div class="order-card status-${isDelivered ? 'done' : (o.statusClass || 'new')}">
+        <div class="order-id">📦 · ${o.timestamp}</div>
+        <div class="order-items">${(o.items||[]).map(i => i.name).join(', ')}</div>
         <div class="order-total">${formatPrice(o.total)}</div>
-        <div class="order-status">${isDelivered ? 'Yetkazib berildi ✅' : o.status}</div>
-        ${canCancel && !isDelivered ? `<button class="btn btn-red" style="margin-top:10px;padding:8px;font-size:0.85rem" onclick="cancelMyOrder('${id}')">🚫 Bekor qilish</button>` : ''}
+        <div class="order-status">${isDelivered ? t('delivered') : (o.status || t('newStatus'))}</div>
+        ${countdownHtml}
+        ${canCancel && !isFinished ? `<button class="btn btn-red" style="margin-top:10px;padding:10px;font-size:0.88rem" onclick="cancelMyOrder('${id}')">${t('cancelBtn')}</button>` : ''}
       </div>
     `;
   }).join('');
+
+  // Har daqiqa yangilanib tursin (countdown uchun)
+  clearTimeout(renderMyOrders._timer);
+  renderMyOrders._timer = setTimeout(() => {
+    if (currentTab === 'orders') renderMyOrders();
+  }, 60000);
 }
 
 function cancelMyOrder(id) {
   if (orders[id] && !orders[id].lockCancel) {
-    ordersRef.child(id).remove()
-      .then(() => showToast('Buyurtma bekor qilindi 🚫'))
-      .catch(() => showToast('Xatolik yuz berdi!'));
+    ordersRef.child(id).update({
+      status: 'Bekor qilindi 🚫',
+      statusClass: 'cancelled',
+      finishedAt: Date.now()
+    }).then(() => {
+      showToast('Buyurtma bekor qilindi 🚫');
+      setTimeout(() => ordersRef.child(id).remove().catch(() => {}), 10 * 60 * 1000);
+    }).catch(() => showToast('Xatolik yuz berdi!'));
   } else {
     showToast('Bekor qilib bo\'lmaydi!');
   }
@@ -1272,11 +1626,15 @@ function showAdminSection(sec) {
 
 function renderAdminMenu() {
   const el = document.getElementById('adminMenuList');
+  if (!el) return;
   if (!menuLoaded) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-weight:700">⏳ Yuklanmoqda...</div>';
+    el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);font-weight:700">⏳ ${t('menuLoading')}</div>`;
     return;
   }
-  if (!menu.length) { el.innerHTML = '<div class="empty"><p>Menyu bo\'sh</p></div>'; return; }
+  if (!menu.length) {
+    el.innerHTML = `<div class="empty"><p>${t('menuEmpty')}</p></div>`;
+    return;
+  }
   el.innerHTML = menu.map(item => `
     <div class="admin-item">
       <div class="admin-item-info">
@@ -1284,8 +1642,8 @@ function renderAdminMenu() {
         <div class="admin-item-price">${formatPrice(item.price)}</div>
       </div>
       <div class="admin-item-btns">
-        <button class="icon-btn" onclick="openEditPrice('${item.id}')" title="Narxni o'zgartirish">✏️</button>
-        <button class="icon-btn" onclick="deleteMenuItem('${item.id}')" title="O'chirish">🗑</button>
+        <button class="icon-btn" onclick="openEditPrice('${item.id}')">✏️</button>
+        <button class="icon-btn" onclick="deleteMenuItem('${item.id}')">🗑</button>
       </div>
     </div>
   `).join('');
@@ -1294,15 +1652,13 @@ function renderAdminMenu() {
 function addMenuItem() {
   const name = document.getElementById('newItemName').value.trim();
   const price = parseInt(document.getElementById('newItemPrice').value);
-  if (!name) { showToast('Nom kiriting!'); return; }
-  if (!price || price < 1) { showToast('Narx kiriting!'); return; }
-  // Firebase ga yozish — yangi unique key bilan
-  const newRef = menuRef.push();
-  newRef.set({ name, price })
+  if (!name) { showToast(t('nameError')); return; }
+  if (!price || price < 1) { showToast(t('priceEnter')); return; }
+  menuRef.push().set({ name, price })
     .then(() => {
       document.getElementById('newItemName').value = '';
       document.getElementById('newItemPrice').value = '';
-      showToast(`${name} qo'shildi ✅`);
+      showToast(`${name} ✅`);
     })
     .catch(() => showToast('Xatolik! Firebase ga ulanib bo\'lmadi.'));
 }
@@ -1310,51 +1666,54 @@ function addMenuItem() {
 function openEditPrice(id) {
   editingItemId = id;
   const item = menu.find(i => i.id === id);
+  if (!item) return;
   document.getElementById('editPriceInput').value = item.price;
   openModal('editModal');
 }
 
 function saveEditPrice() {
   const price = parseInt(document.getElementById('editPriceInput').value);
-  if (!price || price < 1) { showToast('Narx noto\'g\'ri!'); return; }
-  // Firebase da yangilash
+  if (!price || price < 1) { showToast(t('priceError')); return; }
   menuRef.child(editingItemId).update({ price })
-    .then(() => { showToast('✅ Yangilandi!'); closeModal('editModal'); })
-    .catch(() => showToast('Xatolik! Firebase ga ulanib bo\'lmadi.'));
+    .then(() => { showToast(t('updated')); closeModal('editModal'); })
+    .catch(() => showToast('Xatolik!'));
 }
 
 function deleteMenuItem(id) {
-  // Firebase dan o'chirish
   menuRef.child(id).remove()
-    .then(() => showToast('O\'chirildi ✅'))
-    .catch(() => showToast('Xatolik! Firebase ga ulanib bo\'lmadi.'));
+    .then(() => showToast(t('deleted')))
+    .catch(() => showToast('Xatolik!'));
 }
 
 function renderAdminOrders() {
   const el = document.getElementById('adminOrdersContent');
-  // Admin panelda faqat hali kuryerga topshirilmagan yoki topshirilayotgan buyurtmalar ko'rinadi
-  // deliveredByCourier === true bo'lgan buyurtmalar admin panelda YASHIRILADI
+  if (!el) return;
   const all = Object.keys(orders).filter(id => orders[id].deliveredByCourier !== true);
   if (!all.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><p>Faol buyurtmalar yo'q</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><p>${t('noActiveOrders')}</p></div>`;
     return;
   }
   el.innerHTML = all.map(id => {
     const o = orders[id];
-    const payText = o.payType === 'karta' ? "💳 Karta" : "💵 Naqd pul";
+    const payText = o.payType === 'karta' ? t('card') : t('cash');
+    const hasLoc = o.latitude && o.longitude;
     return `
-      <div class="order-card status-${o.statusClass}" id="aorder-${id}">
-        <div class="order-id">🆕 Buyurtma · ${o.timestamp}</div>
-        <div class="order-items">${o.items.map((i,idx)=>`${idx+1}. ${i.name}`).join('<br>')}</div>
-        <div style="margin:6px 0;font-size:0.88rem;color:var(--muted)">📞 ${o.phone} | ${o.address || 'GPS lokatsiya'} | ${payText}</div>
+      <div class="order-card status-${o.statusClass || 'new'}" id="aorder-${id}">
+        <div class="order-id">🆕 · ${o.timestamp}</div>
+        <div class="order-items">${(o.items||[]).map((i,idx)=>`${idx+1}. ${i.name}`).join('<br>')}</div>
+        <div style="margin:6px 0;font-size:0.85rem;color:var(--muted)">
+          📞 ${o.phone}<br>
+          ${hasLoc ? `📍 <a href="https://maps.google.com/?q=${o.latitude},${o.longitude}" target="_blank" style="color:var(--primary);font-weight:700">${t('mapLink')}</a>` : `📍 ${o.address || t('noAddress')}`}<br>
+          ${payText}
+        </div>
         <div class="order-total">${formatPrice(o.total)}</div>
-        <div class="order-status">${o.status}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
-          ${!o.lockCancel ? `<button class="btn btn-green" style="padding:8px;font-size:0.82rem" onclick="adminStartCooking('${id}')">👨‍🍳 Tayyorlash</button>` : ''}
-          <button class="btn btn-primary" style="padding:8px;font-size:0.82rem" onclick="adminAssignCourier('${id}','7312694067')">🚚 Shahriyor</button>
-          <button class="btn btn-primary" style="padding:8px;font-size:0.82rem;background:var(--secondary)" onclick="adminAssignCourier('${id}','222222222')">🚚 Ali</button>
-          <button class="btn btn-secondary" style="padding:8px;font-size:0.82rem" onclick="adminBusy('${id}')">⏳ Ko'p buyurtma</button>
-          <button class="btn btn-red" style="padding:8px;font-size:0.82rem" onclick="adminReject('${id}')">❌ Rad etish</button>
+        <div class="order-status">${o.status || t('newStatus')}</div>
+        <div class="admin-order-btns">
+          ${!o.lockCancel ? `<button class="btn btn-green" onclick="adminStartCooking('${id}')">${t('cookBtn')}</button>` : ''}
+          <button class="btn btn-primary" onclick="adminAssignCourier('${id}','8030496668')">🚚 Shahriyor</button>
+          <button class="btn btn-primary" style="background:var(--secondary)" onclick="adminAssignCourier('${id}','222222222')">🚚 Ali</button>
+          <button class="btn btn-secondary" onclick="adminBusy('${id}')">${t('busyBtn')}</button>
+          <button class="btn btn-red" onclick="adminReject('${id}')">${t('rejectBtn')}</button>
         </div>
       </div>
     `;
@@ -1362,68 +1721,69 @@ function renderAdminOrders() {
 }
 
 function adminStartCooking(id) {
-  if (orders[id]) {
-    ordersRef.child(id).update({
-      lockCancel: true,
-      status: 'Tayyorlanmoqda 👨‍🍳',
-      statusClass: 'cooking'
-    }).then(() => showToast(`#${id} tayyorlanmoqda 👨‍🍳`))
-      .catch(() => showToast('Xatolik!'));
-  }
+  if (!orders[id]) return;
+  ordersRef.child(id).update({
+    lockCancel: true,
+    status: t('cooking'),
+    statusClass: 'cooking'
+  }).then(() => showToast(t('cooking')))
+    .catch(() => showToast('Xatolik!'));
 }
 
 function adminAssignCourier(orderId, courierId) {
-  if (orders[orderId]) {
-    const courier = COURIERS.find(c => c.id === courierId);
-    const courierTgId = COURIER_TG_IDS[courierId];
-    ordersRef.child(orderId).update({
-      status: 'Kuryerga berildi 🚚',
-      statusClass: 'courier',
-      courierId: courierId,
-      lockCancel: true,
-      deliveredByCourier: false
-    }).then(() => {
-      showToast(`#${orderId} ${courier ? courier.name : 'kuryer'}ga yuborildi ✅`);
-      // Kuryerga Telegram xabar yuborish
-      if (courierTgId) {
-        sendOrderToCourier(orders[orderId], orderId, courierTgId, courier ? courier.name : 'Kuryer');
-      }
-    }).catch(() => showToast('Xatolik!'));
-  }
+  // MUHIM: order ma'lumotini Firebase update'dan OLDIN saqlaymiz
+  const orderData = orders[orderId];
+  if (!orderData) { showToast('Buyurtma topilmadi!'); return; }
+
+  const courier = COURIERS.find(c => c.id === courierId);
+  const courierName = courier ? courier.name : 'Kuryer';
+  const courierTgId = COURIER_TG_IDS[courierId];
+
+  ordersRef.child(orderId).update({
+    status: `${t('assigned')} (${courierName})`,
+    statusClass: 'courier',
+    courierId: courierId,
+    lockCancel: true,
+    deliveredByCourier: false
+  }).then(() => {
+    showToast(`✅ ${courierName}ga yuborildi`);
+    // Kuryerga Telegram xabar — oldindan saqlangan orderData ishlatiladi
+    if (courierTgId) {
+      sendOrderToCourier(orderData, orderId, courierTgId, courierName);
+    } else {
+      showToast(`⚠️ ${courierName} TG ID yo'q!`, 3000);
+    }
+  }).catch(() => showToast('Xatolik!'));
 }
 
 function adminBusy(id) {
-  if (orders[id]) {
-    showToast(`⏳ Mijoz ogohlantirildi!`);
-  }
+  showToast('⏳ Mijozga xabar yuborildi!');
+  // Kelajakda mijozga Telegram xabar yuborish qo'shish mumkin
 }
 
 function adminReject(id) {
-  if (orders[id]) {
-    ordersRef.child(id).update({
-      status: 'Rad etildi ❌',
-      statusClass: 'cancelled'
-    }).then(() => {
-      setTimeout(() => {
-        ordersRef.child(id).remove();
-      }, 3000);
-      showToast(`#${id} rad etildi ❌`);
-    }).catch(() => showToast('Xatolik!'));
-  }
+  if (!orders[id]) return;
+  ordersRef.child(id).update({
+    status: 'Rad etildi ❌',
+    statusClass: 'cancelled',
+    finishedAt: Date.now()
+  }).then(() => {
+    showToast('❌ Rad etildi');
+    setTimeout(() => {
+      ordersRef.child(id).remove().catch(() => {});
+    }, 10 * 60 * 1000);
+  }).catch(() => showToast('Xatolik!'));
 }
 
 function renderReport() {
   const el = document.getElementById('reportContent');
+  if (!el) return;
 
-  // Hamma buyurtmalardan (shu jumladan topshirilganlar) hisobot hisoblash
   const allOrders = Object.values(orders);
   const deliveredOrders = allOrders.filter(o => o.deliveredByCourier === true);
   const activeOrders = allOrders.filter(o => o.deliveredByCourier !== true);
-
-  // Jami tushum — faqat topshirilgan buyurtmalardan
   const totalSum = deliveredOrders.reduce((sum, o) => sum + (o.total || 0), 0);
 
-  // Har bir taom necha marta buyurilgani
   const itemCounts = {};
   deliveredOrders.forEach(o => {
     (o.items || []).forEach(i => {
@@ -1431,7 +1791,6 @@ function renderReport() {
     });
   });
 
-  // Kuryer statistikasi — Firebase dagi barcha topshirilgan buyurtmalardan
   const courierDoneCounts = {};
   COURIERS.forEach(c => { courierDoneCounts[c.id] = 0; });
   deliveredOrders.forEach(o => {
@@ -1440,28 +1799,28 @@ function renderReport() {
     }
   });
 
-  let itemsHtml = '';
-  for (let k in itemCounts) {
-    itemsHtml += `<div class="contact-item"><span class="ci-icon">🔹</span> ${k}: <strong>${itemCounts[k]} ta</strong></div>`;
-  }
+  let itemsHtml = Object.entries(itemCounts)
+    .sort((a,b) => b[1]-a[1])
+    .map(([k,v]) => `<div class="contact-item"><span class="ci-icon">🔹</span> ${k}: <strong>${v} ta</strong></div>`)
+    .join('');
 
   el.innerHTML = `
     <div class="stat-box">
       <div class="stat-num">${formatPrice(totalSum)}</div>
-      <div class="stat-label">💰 Jami tushum</div>
+      <div class="stat-label">${t('totalRevenue')}</div>
     </div>
     <div class="card">
-      <div class="card-title">📊 Kunlik hisobot</div>
-      <div class="contact-item"><span class="ci-icon">📦</span> Faol buyurtmalar: <strong>${activeOrders.length} ta</strong></div>
-      <div class="contact-item"><span class="ci-icon">✅</span> Yakunlangan: <strong>${deliveredOrders.length} ta</strong></div>
-      ${itemsHtml || '<div class="text-muted" style="padding:12px">Hali ma\'lumot yo\'q</div>'}
+      <div class="card-title">${t('reportTitle')}</div>
+      <div class="contact-item"><span class="ci-icon">📦</span> ${t('activeCount')}: <strong>${activeOrders.length}</strong></div>
+      <div class="contact-item"><span class="ci-icon">✅</span> ${t('doneCount')}: <strong>${deliveredOrders.length}</strong></div>
+      ${itemsHtml || `<div style="padding:12px;color:var(--muted)">${currentLang==='ru'?'Данных пока нет':'Hali ma\'lumot yo\'q'}</div>`}
     </div>
     <div class="card">
-      <div class="card-title">🚗 Kuryer statistikasi</div>
+      <div class="card-title">${t('courierStat2')}</div>
       ${COURIERS.map(c => `
         <div class="contact-item">
           <span class="ci-icon">👤</span>
-          ${c.name}: <strong>${courierDoneCounts[c.id] || 0} ta topshirildi</strong>
+          ${c.name}: <strong>${courierDoneCounts[c.id] || 0} ${t('deliveredCount')}</strong>
         </div>
       `).join('')}
     </div>
@@ -1472,35 +1831,45 @@ function renderReport() {
 function renderCourierOrders() {
   if (!currentCourierId) return;
   const el = document.getElementById('courierContent');
-  // Faqat ushbu kuryerga biriktirilgan va hali topshirilmagan buyurtmalar
+  if (!el) return;
+
   const myOrders = Object.keys(orders).filter(id =>
     orders[id].courierId === currentCourierId &&
     orders[id].deliveredByCourier !== true
   );
 
-  // Bugun ushbu kuryer tomonidan topshirilgan buyurtmalar soni Firebase dan hisoblanadi
   const doneByCourier = Object.values(orders).filter(o =>
     o.courierId === currentCourierId && o.deliveredByCourier === true
   ).length;
-  document.getElementById('courierDoneCount').textContent = doneByCourier;
+
+  const doneEl = document.getElementById('courierDoneCount');
+  if (doneEl) doneEl.textContent = doneByCourier;
 
   if (!myOrders.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">🚗</div><p>Hozircha buyurtma yo'q</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🚗</div><p>${t('courierEmpty')}</p></div>`;
     return;
   }
+
   el.innerHTML = myOrders.map(id => {
     const o = orders[id];
-    const isOnWay = o.status.includes('Yo\'lda');
+    const isOnWay = (o.status || '').includes('Yo\'lda') || (o.status || '').includes('пути');
+    const hasLoc = o.latitude && o.longitude;
     return `
-      <div class="order-card status-${o.statusClass}">
-        <div class="order-id">📦 Buyurtma · ${o.timestamp}</div>
-        <div class="order-items">${o.items.map((i,idx)=>`${idx+1}. ${i.name}`).join('<br>')}</div>
-        <div style="margin:6px 0;font-size:0.88rem;color:var(--muted)">📞 ${o.phone} | ${o.address || 'GPS lokatsiya'}</div>
+      <div class="order-card status-${o.statusClass || 'new'}">
+        <div class="order-id">📦 · ${o.timestamp}</div>
+        <div class="order-items">${(o.items||[]).map((i,idx)=>`${idx+1}. ${i.name}`).join('<br>')}</div>
+        <div style="margin:6px 0;font-size:0.86rem;color:var(--muted)">
+          📞 <a href="tel:${o.phone}" style="color:var(--primary);font-weight:700">${o.phone}</a><br>
+          ${hasLoc
+            ? `📍 <a href="https://maps.google.com/?q=${o.latitude},${o.longitude}" target="_blank" style="color:var(--primary);font-weight:700">${t('mapLink')}</a>`
+            : `📍 ${o.address || t('noAddress')}`
+          }
+        </div>
         <div class="order-total">${formatPrice(o.total)}</div>
-        <div class="order-status">${o.status}</div>
+        <div class="order-status">${o.status || t('newStatus')}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
-          ${!isOnWay ? `<button class="btn btn-green" style="padding:8px;font-size:0.85rem" onclick="courierTake('${id}')">✅ Qabul qildim</button>` : ''}
-          <button class="btn btn-primary" style="padding:8px;font-size:0.85rem" onclick="courierDone('${id}')">🏁 Topshirdim</button>
+          ${!isOnWay ? `<button class="btn btn-green" style="padding:10px;font-size:0.88rem;margin-top:0" onclick="courierTake('${id}')">${t('acceptBtn')}</button>` : ''}
+          <button class="btn btn-primary" style="padding:10px;font-size:0.88rem;margin-top:0;${!isOnWay?'':'grid-column:1/-1'}" onclick="courierDone('${id}')">${t('doneBtn')}</button>
         </div>
       </div>
     `;
@@ -1508,30 +1877,27 @@ function renderCourierOrders() {
 }
 
 function courierTake(id) {
-  if (orders[id]) {
-    ordersRef.child(id).update({
-      status: "Yo'lda 🚚",
-      statusClass: 'courier'
-    }).then(() => showToast('Mijozga xabar yuborildi! ✅'))
-      .catch(() => showToast('Xatolik!'));
-  }
+  if (!orders[id]) return;
+  ordersRef.child(id).update({
+    status: t('onWay'),
+    statusClass: 'courier'
+  }).then(() => showToast(t('acceptBtn')))
+    .catch(() => showToast('Xatolik!'));
 }
 
 function courierDone(id) {
-  if (orders[id]) {
-    // deliveredByCourier = true qo'yamiz — hisobot shu belgidan hisoblanadi
-    ordersRef.child(id).update({
-      deliveredByCourier: true,
-      status: 'Yetkazib berildi ✅',
-      statusClass: 'done'
-    }).then(() => {
-      // Kuryer panelida "topshirilgan" sonini yangilaymiz (faqat joriy sessiya uchun)
-      if (!courierStats[currentCourierId]) courierStats[currentCourierId] = { done: 0 };
-      courierStats[currentCourierId].done++;
-      renderCourierOrders();
-      showToast('🏁 Buyurtma yakunlandi!');
-    }).catch(() => showToast('Xatolik!'));
-  }
+  if (!orders[id]) return;
+  ordersRef.child(id).update({
+    deliveredByCourier: true,
+    status: t('delivered'),
+    statusClass: 'done',
+    finishedAt: Date.now()
+  }).then(() => {
+    if (!courierStats[currentCourierId]) courierStats[currentCourierId] = { done: 0 };
+    courierStats[currentCourierId].done++;
+    renderCourierOrders();
+    showToast(t('delivered'));
+  }).catch(() => showToast('Xatolik!'));
 }
 
 // ============ ROLE SWITCHING ============
@@ -1541,22 +1907,19 @@ function setRole(role) {
     document.getElementById(`panel-${r}`).classList.remove('active');
   });
   document.getElementById(`panel-${role}`).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (role === 'customer') {
     document.getElementById('floatCart').style.display = cart.length > 0 ? 'flex' : 'none';
     renderMenu();
   } else {
     document.getElementById('floatCart').style.display = 'none';
-    if (role === 'admin') renderAdminMenu();
+    if (role === 'admin') renderAdminOrders();
     if (role === 'courier') renderCourierOrders();
   }
 }
 
 // ============ SECRET TAP (5 marta logo bosish) ============
-const COURIER_PINS = {
-  "7312694067": "1111",  // Shahriyor
-  "222222222":  "2222"   // Ali
-};
 let tapCount = 0;
 let tapTimer = null;
 
@@ -1567,14 +1930,15 @@ function secretTap() {
 
   if (tapCount === 1) {
     hint.style.opacity = '1';
+    hint.textContent = t('tapHint').replace('{n}', remaining);
+    clearTimeout(tapTimer);
     tapTimer = setTimeout(() => {
       tapCount = 0;
       hint.style.opacity = '0';
+      hint.textContent = '';
     }, 3000);
-  }
-
-  if (tapCount >= 2 && tapCount < 5) {
-    hint.textContent = `🔐 ${remaining} ta qoldi...`;
+  } else if (tapCount < 5) {
+    hint.textContent = t('tapHint').replace('{n}', remaining);
   }
 
   if (tapCount >= 5) {
@@ -1588,19 +1952,17 @@ function secretTap() {
 
 function openLogin(role) {
   const el = document.getElementById('loginModalContent');
-  if (role === 'secret' || role === 'admin') {
-    el.innerHTML = `
-      <div style="text-align:center">
-        <div style="font-size:3rem;margin-bottom:8px">🔐</div>
-        <div class="modal-title">Maxfiy kirish</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-        <button class="btn btn-primary" style="margin-top:0" onclick="showLoginForm('admin')">🛠 Admin</button>
-        <button class="btn btn-outline" style="margin-top:0" onclick="showLoginForm('courier')">🚗 Kuryer</button>
-      </div>
-      <div id="loginFormArea"></div>
-    `;
-  }
+  el.innerHTML = `
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:3rem;margin-bottom:8px">🔐</div>
+      <div class="modal-title" style="margin-bottom:0">${t('loginTitle')}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <button class="btn btn-primary" style="margin-top:0" onclick="showLoginForm('admin')">${t('adminLoginBtn')}</button>
+      <button class="btn btn-outline" style="margin-top:0" onclick="showLoginForm('courier')">${t('courierLoginBtn')}</button>
+    </div>
+    <div id="loginFormArea"></div>
+  `;
   openModal('loginModal');
 }
 
@@ -1608,32 +1970,34 @@ function showLoginForm(type) {
   const el = document.getElementById('loginFormArea');
   if (type === 'admin') {
     el.innerHTML = `
-      <div class="form-group" style="margin-top:8px">
-        <label>Admin paroli</label>
-        <input type="password" id="adminPassInput" placeholder="••••••••••" style="text-align:center;letter-spacing:4px;font-size:1.1rem">
+      <div class="form-group">
+        <label>${t('adminPass')}</label>
+        <input type="password" id="adminPassInput" placeholder="${t('adminPassPh')}"
+          style="text-align:center;letter-spacing:4px;font-size:1.1rem"
+          onkeydown="if(event.key==='Enter')loginAdmin()">
       </div>
-      <button class="btn btn-primary" onclick="loginAdmin()">✅ Kirish</button>
+      <button class="btn btn-primary" onclick="loginAdmin()">${t('loginBtn')}</button>
     `;
-    setTimeout(() => document.getElementById('adminPassInput')?.focus(), 100);
+    setTimeout(() => document.getElementById('adminPassInput')?.focus(), 400);
   } else {
     el.innerHTML = `
-      <div style="margin-top:8px">
-        <div class="form-group">
-          <label>Kuryer tanlang</label>
-          <select id="courierSelect" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;font-family:Nunito,sans-serif;font-size:0.95rem;background:var(--bg)">
-            <option value="">— Tanlang —</option>
-            <option value="7312694067">🚗 Shahriyor</option>
-            <option value="222222222">🚗 Ali</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Kuryer PIN kodi</label>
-          <input type="password" id="courierPinInput" placeholder="••••" maxlength="4" style="text-align:center;letter-spacing:8px;font-size:1.3rem">
-        </div>
-        <button class="btn btn-primary" onclick="loginCourierWithPin()">✅ Kirish</button>
+      <div class="form-group">
+        <label>${t('courierSelect')}</label>
+        <select id="courierSelect">
+          <option value="">${t('courierSelectPh')}</option>
+          <option value="8030496668">🚗 Shahriyor</option>
+          <option value="222222222">🚗 Ali</option>
+        </select>
       </div>
+      <div class="form-group">
+        <label>${t('courierPin')}</label>
+        <input type="password" id="courierPinInput" placeholder="${t('courierPinPh')}" maxlength="4"
+          inputmode="numeric"
+          style="text-align:center;letter-spacing:8px;font-size:1.3rem"
+          onkeydown="if(event.key==='Enter')loginCourierWithPin()">
+      </div>
+      <button class="btn btn-primary" onclick="loginCourierWithPin()">${t('loginBtn')}</button>
     `;
-    setTimeout(() => document.getElementById('courierSelect')?.focus(), 100);
   }
 }
 
@@ -1642,9 +2006,10 @@ function loginAdmin() {
   if (pass === ADMIN_ID) {
     closeModal('loginModal');
     setRole('admin');
-    showToast('Admin panel! 🛠');
+    showAdminSection('orders');
+    showToast(t('adminPanel'));
   } else {
-    showToast('❌ Noto\'g\'ri parol!');
+    showToast(t('wrongPass'));
     document.getElementById('adminPassInput').value = '';
     document.getElementById('adminPassInput').focus();
   }
@@ -1653,54 +2018,56 @@ function loginAdmin() {
 function loginCourierWithPin() {
   const id = document.getElementById('courierSelect').value;
   const pin = document.getElementById('courierPinInput').value.trim();
-  if (!id) { showToast('Kuryerni tanlang!'); return; }
-  if (!pin) { showToast('PIN kiriting!'); return; }
+  if (!id) { showToast(t('selectCourier')); return; }
+  if (!pin) { showToast(t('enterPin')); return; }
   if (pin !== COURIER_PINS[id]) {
-    showToast('❌ Noto\'g\'ri PIN!');
+    showToast(t('wrongPin'));
     document.getElementById('courierPinInput').value = '';
     document.getElementById('courierPinInput').focus();
     return;
   }
-  const name = id === '7312694067' ? 'Shahriyor' : 'Ali';
+  const courier = COURIERS.find(c => c.id === id);
+  const name = courier ? courier.name : id;
   currentCourierId = id;
   closeModal('loginModal');
-  document.getElementById('courierPanelTitle').textContent = `🚗 ${name} — Kuryer paneli`;
+  document.getElementById('courierPanelTitle').textContent = `🚗 ${name} — ${t('courierPanel')}`;
   setRole('courier');
-  showToast(`${name} — Kuryer paneli! 🚗`);
+  showToast(`🚗 ${name} — ${t('courierPanel')}!`);
 }
 
-function loginCourier(id, name) {
-  currentCourierId = id;
-  closeModal('loginModal');
-  document.getElementById('courierPanelTitle').textContent = `🚗 ${name} — Kuryer paneli`;
-  setRole('courier');
-  showToast(`${name} — Kuryer paneli! 🚗`);
-}
-
-// ============ FIREBASE REAL-TIME LISTENER — BUYURTMALAR ============
+// ============ FIREBASE REAL-TIME LISTENERS ============
 ordersRef.on('value', (snapshot) => {
   const data = snapshot.val();
   orders = data ? data : {};
   ordersLoaded = true;
 
-  // Barcha panellarni yangilash
+  // Auto-delete: yetkazilgan yoki rad etilgan buyurtmalarni 10 daqiqadan keyin o'chirish
+  const now = Date.now();
+  Object.keys(orders).forEach(id => {
+    const o = orders[id];
+    if (o.deliveredByCourier === true || o.statusClass === 'cancelled') {
+      const finishedAt = o.finishedAt || null;
+      if (finishedAt && (now - finishedAt) >= 10 * 60 * 1000) {
+        ordersRef.child(id).remove().catch(() => {});
+      }
+    }
+  });
+
   if (currentRole === 'admin') renderAdminOrders();
   if (currentRole === 'courier') renderCourierOrders();
   if (currentTab === 'orders') renderMyOrders();
 });
 
-// ============ FIREBASE REAL-TIME LISTENER — MENYU ============
 menuRef.on('value', (snapshot) => {
   const data = snapshot.val();
   if (data) {
-    // Firebase object ni array ga aylantirish
     menu = Object.keys(data).map(key => ({
       id: key,
       name: data[key].name,
       price: data[key].price
     }));
   } else {
-    // Firebase da menyu yo'q — default menyu yuklaymiz
+    // Default menyu
     const defaultMenu = [
       { name: '🍔 Burger', price: 30000 },
       { name: '🍔 Burger dvaynoy', price: 35000 },
@@ -1711,13 +2078,12 @@ menuRef.on('value', (snapshot) => {
     menu = [];
   }
   menuLoaded = true;
-  // Hamma joydagi ko'rinishlarni yangilash
   renderMenu();
   if (currentRole === 'admin') renderAdminMenu();
 });
 
 // ============ INIT ============
-renderMenu(); // loading spinner ko'rsatish uchun
+renderMenu();
 updateFloatCart();
 </script>
 </body>
